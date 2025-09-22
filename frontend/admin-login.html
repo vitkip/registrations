@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="lo">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ເຂົ້າສູ່ລະບົບ Admin - Certificate Registration System</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="shortcut icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🔐</text></svg>">
+</head>
+<body class="bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen">
+    <div class="flex items-center justify-center min-h-screen px-4">
+        <div class="max-w-md w-full">
+            <!-- Header -->
+            <div class="text-center mb-8">
+                <div class="inline-flex items-center justify-center w-16 h-16 bg-blue-600 rounded-full mb-4">
+                    <span class="text-2xl">🔐</span>
+                </div>
+                <h1 class="text-3xl font-bold text-gray-800 lao-text">ເຂົ້າສູ່ລະບົບ Admin</h1>
+                <p class="text-gray-600 mt-2 lao-text">ລະບົບຈັດການລົງທະບຽນຮັບໃບປະກາດນິຍະບັດ</p>
+            </div>
+
+            <!-- Alerts Container -->
+            <div id="alerts-container" class="mb-6"></div>
+
+            <!-- Login Form -->
+            <div class="card">
+                <div class="card-body">
+                    <form id="admin-login-form">
+                        <div class="form-group">
+                            <label class="form-label lao-text">ຊື່ຜູ້ໃຊ້ຫຼືອີເມລ</label>
+                            <input type="text" name="username" class="form-input" placeholder="admin" required>
+                            <div class="form-error"></div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label lao-text">ລະຫັດຜ່ານ</label>
+                            <input type="password" name="password" class="form-input" placeholder="••••••••" required>
+                            <div class="form-error"></div>
+                        </div>
+
+                        <div class="form-group">
+                            <button type="submit" class="btn-primary w-full text-lg py-3">
+                                🔓 ເຂົ້າສູ່ລະບົບ
+                            </button>
+                        </div>
+
+                        <div class="text-center mt-4">
+                            <a href="index.html" class="text-blue-600 hover:text-blue-800 text-sm lao-text">
+                                ← ກັບໄປໜ້າຫຼັກ
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Test Accounts Info -->
+            <div class="card mt-6">
+                <div class="card-body">
+                    <h3 class="font-semibold text-gray-800 mb-3 lao-text">ບັນຊີທົດສອບ:</h3>
+                    <div class="space-y-2 text-sm">
+                        <div class="p-3 bg-gray-50 rounded-lg">
+                            <strong>Admin:</strong> admin / password123
+                        </div>
+                     
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/api.js"></script>
+    <script>
+        // Check if already logged in
+        if (api.token) {
+            window.location.href = 'admin-dashboard.html';
+        }
+
+        // Login form submission
+        document.getElementById('admin-login-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            if (!UIUtils.validateForm('admin-login-form')) {
+                return;
+            }
+
+            const submitBtn = e.target.querySelector('button[type="submit"]');
+            const hideLoading = UIUtils.showLoading(submitBtn);
+
+            try {
+                const formData = new FormData(e.target);
+                const username = formData.get('username');
+                const password = formData.get('password');
+
+                const result = await api.login(username, password);
+
+                if (result.success) {
+                    // Store token and user info
+                    api.setToken(result.token);
+                    localStorage.setItem('user_info', JSON.stringify(result.user));
+                    
+                    UIUtils.showAlert('ເຂົ້າສູ່ລະບົບສຳເລັດ! ກຳລັງໂອນ...', 'success');
+                    
+                    // Redirect to dashboard
+                    setTimeout(() => {
+                        window.location.href = 'admin-dashboard.html';
+                    }, 1000);
+                } else {
+                    UIUtils.showAlert(result.message || 'ຊື່ຜູ້ໃຊ້ຫຼືລະຫັດຜ່ານບໍ່ຖືກຕ້ອງ', 'error');
+                }
+            } catch (error) {
+                console.error('Login error:', error);
+                UIUtils.showAlert('ເກີດຂໍ້ຜິດພາດໃນການເຊື່ອມຕໍ່ລະບົບ', 'error');
+            } finally {
+                hideLoading();
+            }
+        });
+
+        // Handle Enter key
+        document.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                document.getElementById('admin-login-form').dispatchEvent(new Event('submit'));
+            }
+        });
+    </script>
+</body>
+</html>

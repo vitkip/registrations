@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="lo">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Certificate Registration System</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="shortcut icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📊</text></svg>">
+</head>
+<body class="bg-gray-50">
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="container mx-auto px-4 flex justify-between items-center">
+            <a href="#" class="navbar-brand flex items-center">
+                <span class="text-2xl mr-2">📊</span>
+                Admin Dashboard
+            </a>
+            <div class="navbar-nav flex items-center">
+                <span id="user-info" class="mr-4 text-white/90"></span>
+                <button onclick="logout()" class="nav-link">ອອກຈາກລະບົບ</button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container mx-auto px-4 py-8">
+        <!-- Alerts Container -->
+        <div id="alerts-container" class="mb-6"></div>
+
+        <!-- Statistics Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+            <div class="card bg-gradient-to-r from-blue-500 to-blue-600 text-white">
+                <div class="card-body">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-blue-100">ລວມທັງໝົດ</p>
+                            <p class="text-3xl font-bold" id="total-registrations">-</p>
+                        </div>
+                        <span class="text-4xl opacity-80">👥</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card bg-gradient-to-r from-yellow-500 to-yellow-600 text-white">
+                <div class="card-body">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-yellow-100">ລໍຖ້າອະນຸມັດ</p>
+                            <p class="text-3xl font-bold" id="pending-registrations">-</p>
+                        </div>
+                        <span class="text-4xl opacity-80">⏳</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card bg-gradient-to-r from-green-500 to-green-600 text-white">
+                <div class="card-body">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-green-100">ອະນຸມັດແລ້ວ</p>
+                            <p class="text-3xl font-bold" id="approved-registrations">-</p>
+                        </div>
+                        <span class="text-4xl opacity-80">✅</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card bg-gradient-to-r from-purple-500 to-purple-600 text-white">
+                <div class="card-body">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-purple-100">ອອກໃບຢັ້ງຢືນແລ້ວ</p>
+                            <p class="text-3xl font-bold" id="issued-registrations">-</p>
+                        </div>
+                        <span class="text-4xl opacity-80">🎓</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            <div class="card hover:shadow-lg transition-shadow">
+                <div class="card-body text-center">
+                    <span class="text-4xl mb-4 block">📋</span>
+                    <h3 class="text-xl font-semibold mb-2 lao-text">ຈັດການການລົງທະບຽນ</h3>
+                    <p class="text-gray-600 mb-4 lao-text">ອະນຸມັດ, ປະຕິເສດ, ຫຼືອອກໃບຢັ້ງຢືນ</p>
+                    <a href="admin-registrations.html" class="btn-primary">ເຂົ້າໄປຈັດການ</a>
+                </div>
+            </div>
+
+            <div class="card hover:shadow-lg transition-shadow">
+                <div class="card-body text-center" id="user-management-card">
+                    <span class="text-4xl mb-4 block">👤</span>
+                    <h3 class="text-xl font-semibold mb-2 lao-text">ຈັດການຜູ້ໃຊ້</h3>
+                    <p class="text-gray-600 mb-4 lao-text">ສ້າງ, ແກ້ໄຂ, ຫຼືລຶບບັນຊີຜູ້ໃຊ້</p>
+                    <a href="admin-users.html" class="btn-primary">ຈັດການຜູ້ໃຊ້</a>
+                </div>
+            </div>
+
+            <div class="card hover:shadow-lg transition-shadow">
+                <div class="card-body text-center">
+                    <span class="text-4xl mb-4 block">📊</span>
+                    <h3 class="text-xl font-semibold mb-2 lao-text">ສົ່ງອອກຂໍ້ມູນ</h3>
+                    <p class="text-gray-600 mb-4 lao-text">ສົ່ງອອກລາຍງານເປັນ Excel ຫຼື CSV</p>
+                    <button onclick="showExportModal()" class="btn-secondary">ສົ່ງອອກຂໍ້ມູນ</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Registrations -->
+        <div class="card">
+            <div class="card-header flex justify-between items-center">
+                <h2 class="text-xl font-bold lao-text">ການລົງທະບຽນລ່າສຸດ</h2>
+                <a href="admin-registrations.html" class="text-white/80 hover:text-white text-sm">ເບິ່ງທັງໝົດ →</a>
+            </div>
+            <div class="card-body">
+                <div class="table-container">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>ລະຫັດນັກສຶກສາ</th>
+                                <th>ຊື່ - ນາມສະກຸນ</th>
+                                <th>ສາຂາວິຊາ</th>
+                                <th>ປີສຳເລັດ</th>
+                                <th>ສະຖານະ</th>
+                                <th>ວັນທີລົງທະບຽນ</th>
+                                <th>ການດຳເນີນງານ</th>
+                            </tr>
+                        </thead>
+                        <tbody id="recent-registrations">
+                            <tr>
+                                <td colspan="7" class="text-center py-8 text-gray-500">
+                                    <span class="spinner mr-2"></span>ກຳລັງໂຫລດຂໍ້ມູນ...
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Export Modal -->
+    <div id="export-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50">
+        <div class="bg-white rounded-lg p-6 max-w-md w-full mx-4">
+            <h3 class="text-xl font-bold mb-4 lao-text">ສົ່ງອອກຂໍ້ມູນ</h3>
+            
+            <form id="export-form">
+                <div class="form-group">
+                    <label class="form-label lao-text">ຮູບແບບ</label>
+                    <select name="format" class="form-input">
+                        <option value="excel">Excel (.xls)</option>
+                        <option value="csv">CSV (.csv)</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label lao-text">ສະຖານະ</label>
+                    <select name="status" class="form-input">
+                        <option value="">ທັງໝົດ</option>
+                        <option value="pending">ລໍຖ້າອະນຸມັດ</option>
+                        <option value="approved">ອະນຸມັດແລ້ວ</option>
+                        <option value="rejected">ປະຕິເສດ</option>
+                        <option value="certificate_issued">ອອກໃບຢັ້ງຢືນແລ້ວ</option>
+                    </select>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="form-group">
+                        <label class="form-label lao-text">ຈາກວັນທີ</label>
+                        <input type="date" name="date_from" class="form-input">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label lao-text">ເຖິງວັນທີ</label>
+                        <input type="date" name="date_to" class="form-input">
+                    </div>
+                </div>
+
+                <div class="flex gap-3 mt-6">
+                    <button type="submit" class="btn-primary flex-1">📊 ສົ່ງອອກ</button>
+                    <button type="button" onclick="hideExportModal()" class="btn-secondary">ຍົກເລີກ</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/api.js"></script>
+    <script>
+        let userInfo = null;
+
+        // Check authentication
+        async function checkAuth() {
+            if (!api.token) {
+                window.location.href = 'admin-login.html';
+                return;
+            }
+
+            try {
+                const result = await api.verifyToken();
+                if (!result.success) {
+                    throw new Error('Token verification failed');
+                }
+                
+                userInfo = result.user;
+                document.getElementById('user-info').textContent = `ສະບາຍດີ, ${userInfo.full_name} (${userInfo.role})`;
+                
+                // Hide user management for non-admin users
+                if (userInfo.role !== 'admin') {
+                    document.getElementById('user-management-card').style.display = 'none';
+                }
+                
+            } catch (error) {
+                console.error('Auth check failed:', error);
+                api.removeToken();
+                window.location.href = 'admin-login.html';
+            }
+        }
+
+        // Load dashboard data
+        async function loadDashboardData() {
+            try {
+                const result = await api.getRegistrations(1, 10);
+                
+                if (result.success) {
+                    // Update statistics
+                    const stats = result.statistics || {};
+                    document.getElementById('total-registrations').textContent = 
+                        (stats.pending || 0) + (stats.approved || 0) + (stats.rejected || 0) + (stats.certificate_issued || 0);
+                    document.getElementById('pending-registrations').textContent = stats.pending || 0;
+                    document.getElementById('approved-registrations').textContent = stats.approved || 0;
+                    document.getElementById('issued-registrations').textContent = stats.certificate_issued || 0;
+                    
+                    // Update recent registrations table
+                    displayRecentRegistrations(result.registrations);
+                }
+            } catch (error) {
+                console.error('Failed to load dashboard data:', error);
+                UIUtils.showAlert('ເກີດຂໍ້ຜິດພາດໃນການໂຫລດຂໍ້ມູນ', 'error');
+            }
+        }
+
+        function displayRecentRegistrations(registrations) {
+            const tbody = document.getElementById('recent-registrations');
+            
+            if (!registrations || registrations.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" class="text-center py-8 text-gray-500">ບໍ່ມີຂໍ້ມູນການລົງທະບຽນ</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = registrations.map(reg => `
+                <tr>
+                    <td class="font-mono">${reg.student_code}</td>
+                    <td>${reg.first_name} ${reg.last_name}</td>
+                    <td>${reg.major || '-'}</td>
+                    <td>${reg.graduation_year || '-'}</td>
+                    <td>${UIUtils.getStatusBadge(reg.status)}</td>
+                    <td>${UIUtils.formatDateLao(reg.registration_date)}</td>
+                    <td>
+                        <div class="flex gap-2">
+                            ${reg.status === 'pending' ? 
+                                `<button onclick="updateStatus(${reg.id}, 'approved')" class="btn-success btn-sm">ອະນຸມັດ</button>
+                                 <button onclick="updateStatus(${reg.id}, 'rejected')" class="btn-danger btn-sm">ປະຕິເສດ</button>` :
+                                `<span class="text-gray-500 text-sm">-</span>`
+                            }
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        // Update registration status
+        async function updateStatus(id, status) {
+            if (!confirm(`ທ່ານແນ່ໃຈບໍ່ວ່າຕ້ອງການ${status === 'approved' ? 'ອະນຸມັດ' : 'ປະຕິເສດ'}ການລົງທະບຽນນີ້?`)) {
+                return;
+            }
+
+            try {
+                const result = await api.updateRegistration(id, status);
+                
+                if (result.success) {
+                    UIUtils.showAlert('ປັບປຸງສະຖານະສຳເລັດ', 'success');
+                    loadDashboardData(); // Reload data
+                } else {
+                    UIUtils.showAlert(result.message || 'ເກີດຂໍ້ຜິດພາດ', 'error');
+                }
+            } catch (error) {
+                console.error('Status update failed:', error);
+                UIUtils.showAlert('ເກີດຂໍ້ຜິດພາດໃນການປັບປຸງສະຖານະ', 'error');
+            }
+        }
+
+        // Export modal functions
+        function showExportModal() {
+            document.getElementById('export-modal').classList.remove('hidden');
+        }
+
+        function hideExportModal() {
+            document.getElementById('export-modal').classList.add('hidden');
+        }
+
+        // Export form submission
+        document.getElementById('export-form').addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            const formData = new FormData(e.target);
+            const filters = {
+                format: formData.get('format'),
+                status: formData.get('status'),
+                date_from: formData.get('date_from'),
+                date_to: formData.get('date_to')
+            };
+            
+            // Remove empty filters
+            Object.keys(filters).forEach(key => {
+                if (!filters[key]) delete filters[key];
+            });
+            
+            api.exportRegistrations(filters.format || 'excel', filters);
+            hideExportModal();
+            UIUtils.showAlert('ການສົ່ງອອກຂໍ້ມູນເລີ່ມຕົ້ນແລ້ວ', 'info');
+        });
+
+        // Logout function
+        async function logout() {
+            if (confirm('ທ່ານແນ່ໃຈບໍ່ວ່າຕ້ອງການອອກຈາກລະບົບ?')) {
+                try {
+                    await api.logout();
+                } catch (error) {
+                    console.error('Logout error:', error);
+                }
+                
+                api.removeToken();
+                window.location.href = 'admin-login.html';
+            }
+        }
+
+        // Close modal when clicking outside
+        document.getElementById('export-modal').addEventListener('click', (e) => {
+            if (e.target.id === 'export-modal') {
+                hideExportModal();
+            }
+        });
+
+        // Initialize dashboard
+        document.addEventListener('DOMContentLoaded', async () => {
+            await checkAuth();
+            await loadDashboardData();
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,175 @@
+# ===========================
+# Registration System .gitignore
+# ===========================
+
+# === Docker & Environment ===
+.env
+.env.local
+.env.production
+docker-compose.override.yml
+
+# === Database ===
+# ไฟล์ข้อมูลฐานข้อมูล MySQL
+/mysql-data/
+/db-data/
+*.sql
+*.dump
+/backups/
+
+# === File Uploads ===
+# ไฟล์อัปโหลดจากผู้ใช้ (รูปโปรไฟล์และหลักฐานการชำระเงิน)
+/backend/uploads/profiles/
+/backend/uploads/payments/
+/uploads/
+
+# เก็บโฟลเดอร์แต่ไม่เก็บไฟล์ข้างใน
+!backend/uploads/profiles/.gitkeep
+!backend/uploads/payments/.gitkeep
+
+# === Logs ===
+# ไฟล์ log ต่าง ๆ
+/logs/
+*.log
+error.log
+access.log
+php_errors.log
+
+# Apache/Nginx logs
+/var/log/
+
+# === Temporary Files ===
+# ไฟล์ชั่วคราว
+/tmp/
+/temp/
+*.tmp
+*.temp
+*.cache
+
+# === IDE & Editor ===
+# Visual Studio Code
+.vscode/
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+
+# IntelliJ IDEA / PhpStorm
+.idea/
+*.iml
+*.iws
+*.ipr
+
+# Sublime Text
+*.sublime-project
+*.sublime-workspace
+
+# Vim
+*.swp
+*.swo
+*~
+
+# === OS Generated Files ===
+# macOS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+*.cab
+*.msi
+*.msix
+*.msm
+*.msp
+*.lnk
+
+# Linux
+*~
+.fuse_hidden*
+.directory
+.Trash-*
+.nfs*
+
+# === PHP Specific ===
+# Composer
+/vendor/
+composer.lock
+composer.phar
+
+# PHP Sessions
+/tmp/sess_*
+
+# PHP Opcache
+opcache/
+
+# === Node.js (ถ้ามีการใช้งาน) ===
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+package-lock.json
+yarn.lock
+
+# === Security ===
+# ไฟล์ที่มีข้อมูลสำคัญ
+*.key
+*.pem
+*.p12
+*.crt
+*.csr
+config/secrets.php
+private/
+
+# === Backup Files ===
+*.bak
+*.backup
+*.old
+*.orig
+*~
+*.rej
+
+# Backup directory (keep scripts but ignore backup files)
+/backups/
+!scripts/
+scripts/*.log
+
+# === Development Tools ===
+# Testing
+/tests/coverage/
+phpunit.xml
+.phpunit.result.cache
+
+# === Custom Project Files ===
+# ไฟล์ทดสอบ
+test_*.php
+test_*.html
+debug.php
+phpinfo.php
+
+# การตั้งค่าการพัฒนาเฉพาะบุคคล
+config/local.php
+config/dev.php
+
+# === Certificates & SSL ===
+*.crt
+*.key
+*.pem
+ssl/
+
+# === Documentation ===
+# Generated documentation
+/docs/generated/
+/api-docs/
+
+# === Miscellaneous ===
+# ไฟล์อื่น ๆ ที่ไม่ต้องการใน version control
+TODO.md
+NOTES.md
+.htaccess.bak

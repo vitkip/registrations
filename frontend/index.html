@@ -1,0 +1,812 @@
+<!DOCTYPE html>
+<html lang="lo">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ລະບົບລົງທະບຽນຮັບໃບປະກາດນິຍະບັດ - Certificate Registration System</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="shortcut icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎓</text></svg>">
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <!-- Animate.css for SweetAlert2 animations -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+    <style>
+        .colored-toast.swal2-icon-success {
+            background-color: #a7f3d0 !important;
+        }
+        
+        .colored-toast.swal2-icon-error {
+            background-color: #fecaca !important;
+        }
+        
+        .colored-toast .swal2-title {
+            color: white;
+        }
+        
+        .colored-toast .swal2-close {
+            color: white;
+        }
+        
+        .colored-toast .swal2-html-container {
+            color: white;
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="container mx-auto px-4 flex justify-between items-center">
+            <a href="#" class="navbar-brand flex items-center">
+                <span class="text-2xl mr-2">🎓</span>
+                ລະບົບລົງທະບຽນຮັບໃບປະກາດນິຍະບັດ ວິທະຍາໄລຄູສົງ ອົງຕື້
+            </a>
+            <div class="navbar-nav hidden md:flex">
+                <a href="#registration" class="nav-link">ລົງທະບຽນ</a>
+                <a href="#check-status" class="nav-link">ກວດສອບສະຖານະ</a>
+                <a href="admin-login.html" class="nav-link">ເຂົ້າສູ່ລະບົບ Admin</a>
+            </div>
+            <button class="md:hidden text-white" id="mobile-menu-btn">☰</button>
+        </div>
+    </nav>
+
+    <!-- Mobile Menu -->
+    <div id="mobile-menu" class="hidden bg-blue-800 md:hidden">
+        <div class="container mx-auto px-4 py-2">
+            <a href="#registration" class="block nav-link">ລົງທະບຽນ</a>
+            <a href="#check-status" class="block nav-link">ກວດສອບສະຖານະ</a>
+            <a href="admin-login.html" class="block nav-link">ເຂົ້າສູ່ລະບົບ Admin</a>
+        </div>
+    </div>
+
+    <!-- Hero Section -->
+    <div class="bg-gradient-to-br from-blue-600 via-blue-700 to-indigo-800 text-white py-20 relative overflow-hidden">
+        <!-- Background decoration -->
+        <div class="absolute inset-0 opacity-10">
+            <div class="absolute top-10 left-10 w-32 h-32 bg-white rounded-full blur-3xl"></div>
+            <div class="absolute bottom-10 right-10 w-48 h-48 bg-blue-300 rounded-full blur-3xl"></div>
+            <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-indigo-300 rounded-full blur-3xl"></div>
+        </div>
+        
+        <div class="container mx-auto px-4 text-center relative z-10">
+            <div class="mb-8 animate-bounce">
+                <span class="text-6xl md:text-7xl">🎓</span>
+            </div>
+            <h1 class="text-4xl md:text-6xl font-bold mb-6 lao-text leading-tight">
+                ຍິນດີຕ້ອນຮັບ ບັນດິດໃໝ່ທຸກໆອົງ
+            </h1>
+            <div class="text-center mb-8">
+                <p class="text-xl md:text-2xl mb-4 lao-text opacity-90 font-light">
+                    <span id="registration-count">ຈຳນວນຜູ້ລົງທະບຽນ: <span class="font-bold text-yellow-300">0</span> ອົງ</span>
+                </p>
+                <!-- สถิติแยกตามสถานะ -->
+                <div id="registration-stats" class="flex flex-wrap justify-center gap-4 text-sm opacity-80 hidden">
+                    <span id="pending-count" class="bg-white/20 px-3 py-1 rounded-full">🕐 ຖ້າອະນຸມັດ: <strong>0</strong></span>
+                    <span id="approved-count" class="bg-white/20 px-3 py-1 rounded-full">✅ ອະນຸມັດແລ້ວ: <strong>0</strong></span>
+                    <span id="rejected-count" class="bg-white/20 px-3 py-1 rounded-full">❌ ປະຕິເສດ: <strong>0</strong></span>
+                    <span id="certificate-count" class="bg-white/20 px-3 py-1 rounded-full">🎓 ອອກໃບຢັ້ງຢືນ: <strong>0</strong></span>
+                </div>
+                <!-- เวลาอัปเดตล่าสุด -->
+                <p id="last-updated" class="text-xs opacity-60 mt-2 hidden">
+                    <span id="loading-indicator" class="inline-block w-2 h-2 bg-green-400 rounded-full mr-2 animate-pulse"></span>
+                    ອັບເດດເມື່ອ: <span id="update-time">--</span>
+                </p>
+            </div>
+            <p class="text-lg mb-12 opacity-80 max-w-2xl mx-auto">
+                ນັກສຶກສາທຸກອົງທີ່ຈັບໃນ ສົກຮຽນ 2020-2025 ສາມາດລົງທະບຽນເຂົ້າຮັບໃບປະການໄດ້
+            </p>
+            <div class="flex flex-col md:flex-row gap-6 justify-center">
+                <button onclick="scrollToSection('registration')" class="btn-primary text-lg px-10 py-4 rounded-full shadow-2xl hover:shadow-blue-500/25 transform hover:scale-105 transition-all duration-300">
+                    <span class="flex items-center justify-center gap-3">
+                        📝 <span>ລົງທະບຽນດຽວນີ້</span>
+                    </span>
+                </button>
+                <button onclick="scrollToSection('check-status')" class="bg-white/20 backdrop-blur-sm border border-white/30 text-white hover:bg-white/30 text-lg px-10 py-4 rounded-full shadow-2xl transform hover:scale-105 transition-all duration-300">
+                    <span class="flex items-center justify-center gap-3">
+                        🔍 <span>ກວດສອບສະຖານະ</span>
+                    </span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="container mx-auto px-4 py-8">
+        <!-- Alerts Container -->
+        <div id="alerts-container" class="mb-6"></div>
+
+        <!-- Registration Section -->
+        <section id="registration" class="mb-12">
+            <div class="text-center mb-12">
+                <div class="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-2xl mb-6">
+                    <span class="text-2xl">📝</span>
+                </div>
+                <h2 class="text-4xl font-bold text-gray-800 mb-4 lao-text">ແບບຟອມລົງທະບຽນ</h2>
+                <p class="text-gray-600 text-lg max-w-2xl mx-auto">ກະລຸນາຕື່ມຂໍ້ມູນໃຫ້ຄົບຖ້ວນ ແລະ ຖືກຕ້ອງເພື່ອການລົງທະບຽນທີ່ສຳເລັດ</p>
+            </div>
+            <div class="bg-white rounded-3xl shadow-2xl border border-gray-100 overflow-hidden">
+                <div class="bg-gradient-to-r from-blue-50 to-indigo-50 px-8 py-6 border-b border-blue-100">
+                    <div class="flex items-center gap-3">
+                        <div class="w-2 h-2 bg-blue-500 rounded-full"></div>
+                        <div class="w-2 h-2 bg-indigo-500 rounded-full"></div>
+                        <div class="w-2 h-2 bg-purple-500 rounded-full"></div>
+                        <span class="text-gray-600 ml-4 font-medium">ຂັ້ນຕອນການລົງທະບຽນ</span>
+                    </div>
+                </div>
+                <div class="p-8">
+                    <form id="registration-form" enctype="multipart/form-data" class="space-y-8">
+                        <!-- Personal Information -->
+                        <div class="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl p-6 border-l-4 border-blue-500">
+                            <div class="flex items-center gap-3 mb-6">
+                                <div class="w-8 h-8 bg-blue-500 text-white rounded-lg flex items-center justify-center">
+                                    <span class="text-sm">👤</span>
+                                </div>
+                                <h3 class="text-xl font-bold text-blue-800 lao-text">ຂໍ້ມູນສ່ວນຕົວ</h3>
+                            </div>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            
+                                <div class="form-group">
+                                    <label class="form-label lao-text text-gray-700 font-medium mb-2 flex items-center gap-2">
+                                        <span class="text-blue-500">👤</span> ຊື່ *
+                                    </label>
+                                    <input type="text" name="first_name" class="form-input bg-white border-2 border-gray-200 rounded-xl px-4 py-3 focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition-all" required>
+                                    <div class="form-error"></div>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label class="form-label lao-text text-gray-700 font-medium mb-2 flex items-center gap-2">
+                                        <span class="text-blue-500">👤</span> ນາມສະກຸນ *
+                                    </label>
+                                    <input type="text" name="last_name" class="form-input bg-white border-2 border-gray-200 rounded-xl px-4 py-3 focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition-all" required>
+                                    <div class="form-error"></div>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label class="form-label lao-text text-gray-700 font-medium mb-2 flex items-center gap-2">
+                                        <span class="text-blue-500">⚤</span> ເພດ *
+                                    </label>
+                                    <select name="gender" class="form-input bg-white border-2 border-gray-200 rounded-xl px-4 py-3 focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition-all" required>
+                                        <option value="">ເລືອກເພດ</option>
+                                        <option value="Male">👨 ພຣະ</option>
+                                        <option value="Female">👩 ສ.ນ </option>
+                                    </select>
+                                    <div class="form-error"></div>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label class="form-label lao-text text-gray-700 font-medium mb-2 flex items-center gap-2">
+                                        <span class="text-blue-500">📅</span> ວັນເກີດ *
+                                    </label>
+                                    <input type="date" name="date_of_birth" class="form-input bg-white border-2 border-gray-200 rounded-xl px-4 py-3 focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition-all" required>
+                                    <div class="form-error"></div>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label class="form-label lao-text text-gray-700 font-medium mb-2 flex items-center gap-2">
+                                        <span class="text-blue-500">📱</span> ເບີໂທລະສັບ *
+                                    </label>
+                                    <input type="tel" name="phone" class="form-input bg-white border-2 border-gray-200 rounded-xl px-4 py-3 focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition-all" placeholder="020-XXXX-XXXX" required>
+                                    <div class="form-error"></div>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label class="form-label lao-text text-gray-700 font-medium mb-2 flex items-center gap-2">
+                                        <span class="text-blue-500">📧</span> ອີເມລ *
+                                    </label>
+                                    <input type="email" name="email" class="form-input bg-white border-2 border-gray-200 rounded-xl px-4 py-3 focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition-all" placeholder="example@email.com" required>
+                                    <div class="form-error"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Course Information -->
+                        <div class="bg-gradient-to-r from-green-50 to-emerald-50 rounded-2xl p-6 border-l-4 border-green-500">
+                            <div class="flex items-center gap-3 mb-6">
+                                <div class="w-8 h-8 bg-green-500 text-white rounded-lg flex items-center justify-center">
+                                    <span class="text-sm">💰</span>
+                                </div>
+                                <div class="group cursor-pointer" onclick="copyToClipboard('010120001062171001', this)">
+                                    <h3 class="text-xl font-bold text-green-800 lao-text flex items-center gap-2">
+                                        <span>BCEL:010120001062171001</span>
+                                        <span class="text-sm text-gray-500 opacity-0 group-hover:opacity-100 transition-opacity">📋</span>
+                                    </h3>
+                                </div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label lao-text text-gray-700 font-medium mb-2 flex items-center gap-2">
+                                    <span class="text-green-500">💵</span> ຄ່າທຳນຽມລົງທະບຽນຮັບໃບປະກາດ *
+                                    
+                                </label>
+                                <select name="payment_amount" class="form-input bg-white border-2 border-gray-200 rounded-xl px-4 py-3 focus:border-green-500 focus:ring-4 focus:ring-green-100 transition-all" required>
+                                    <option value="">ເລືອກຄ່າທຳນຽມ</option>
+                                    <option value="100000">💰 100,000 LAK</option>
+                                </select>
+                                <div class="form-error"></div>
+                            </div>
+                        </div>
+
+                        <!-- Academic Information -->
+                        <div class="bg-gradient-to-r from-purple-50 to-violet-50 rounded-2xl p-6 border-l-4 border-purple-500">
+                            <div class="flex items-center gap-3 mb-6">
+                                <div class="w-8 h-8 bg-purple-500 text-white rounded-lg flex items-center justify-center">
+                                    <span class="text-sm">🎓</span>
+                                </div>
+                                <h3 class="text-xl font-bold text-purple-800 lao-text">ຂໍ້ມູນການສຶກສາ</h3>
+                            </div>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div class="form-group">
+                                    <label class="form-label lao-text text-gray-700 font-medium mb-2 flex items-center gap-2">
+                                        <span class="text-purple-500">📚</span> ສາຂາວິຊາ *
+                                    </label>
+                                    <select name="major" class="form-input bg-white border-2 border-gray-200 rounded-xl px-4 py-3 focus:border-purple-500 focus:ring-4 focus:ring-purple-100 transition-all" required>
+                                        <option value="">ເລືອກສາຂາວິຊາ</option>
+                                        <option value="ສາຍພຸດທະສາສະໜາ-ພາສາລາວ">💻 ສາຍພຸດທະສາສະໜາ-ພາສາລາວ</option>
+                                        <option value="ພຸດທະສາສະໜາ-ວັນນະຄະດີ">🏦 ພຸດທະສາສະໜາ-ວັນນະຄະດີ</option>
+                                        <option value="ພາສາອັງກິດ">📊 ພາສາອັງກິດ</option>
+                                       
+                                    </select>
+                                    <div class="form-error"></div>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label class="form-label lao-text text-gray-700 font-medium mb-2 flex items-center gap-2">
+                                        <span class="text-purple-500">🗓️</span> ປີສຳເລັດການສຶກສາ *
+                                    </label>
+                                    <select name="graduation_year" class="form-input bg-white border-2 border-gray-200 rounded-xl px-4 py-3 focus:border-purple-500 focus:ring-4 focus:ring-purple-100 transition-all" required>
+                                        <option value="">ເລືອກປີສຳເລັດ</option>
+                                        <option value="2020">🎓 2020</option>
+                                        <option value="2021">🎓 2021</option>
+                                        <option value="2022">🎓 2022</option>
+                                        <option value="2023">🎓 2023</option>
+                                        <option value="2024">🎓 2024</option>
+                                        <option value="2025">🎓 2025</option>
+
+                                    </select>
+                                    <div class="form-error"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- File Uploads -->
+                        <div class="bg-gradient-to-r from-orange-50 to-amber-50 rounded-2xl p-6 border-l-4 border-orange-500">
+                            <div class="flex items-center gap-3 mb-6">
+                                <div class="w-8 h-8 bg-orange-500 text-white rounded-lg flex items-center justify-center">
+                                    <span class="text-sm">📎</span>
+                                </div>
+                                <h3 class="text-xl font-bold text-orange-800 lao-text">ເອກະສານ</h3>
+                            </div>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div class="form-group">
+                                    <label class="form-label lao-text text-gray-700 font-medium mb-3 flex items-center gap-2">
+                                        <span class="text-orange-500">📷</span> ຮູບໂປຣໄຟລ໌
+                                        <span class="text-xs text-gray-500">(JPG, PNG ບໍ່ເກີນ 2MB)</span>
+                                    </label>
+                                    <div class="file-upload">
+                                        <input type="file" name="profile_image" accept="image/*" class="file-upload-input" id="profile-upload">
+                                        <label for="profile-upload" class="group file-upload-label bg-white border-2 border-dashed border-orange-300 rounded-xl p-6 hover:border-orange-500 hover:bg-orange-50 transition-all cursor-pointer">
+                                            <div class="file-upload-text text-center">
+                                                <div class="text-3xl mb-2 group-hover:scale-110 transition-transform">📷</div>
+                                                <div class="text-orange-600 font-medium">ກົດເພື່ອເລືອກຮູບໂປຣໄຟລ໌</div>
+                                                <div class="text-sm text-gray-500 mt-1">ຫຼື ລາກໄຟລ໌ມາວາງບ່ອນນີ້</div>
+                                            </div>
+                                        </label>
+                                    </div>
+                                    <div class="form-error"></div>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label class="form-label lao-text text-gray-700 font-medium mb-3 flex items-center gap-2">
+                                        <span class="text-orange-500">💰</span> ຫຼັກຖານການຊຳລະເງິນ
+                                        <span class="text-xs text-gray-500">(JPG, PNG, PDF ບໍ່ເກີນ 5MB)</span>
+                                    </label>
+                                    <div class="file-upload">
+                                        <input type="file" name="payment_proof" accept="image/*,.pdf" class="file-upload-input" id="payment-upload">
+                                        <label for="payment-upload" class="group file-upload-label bg-white border-2 border-dashed border-orange-300 rounded-xl p-6 hover:border-orange-500 hover:bg-orange-50 transition-all cursor-pointer">
+                                            <div class="file-upload-text text-center">
+                                                <div class="text-3xl mb-2 group-hover:scale-110 transition-transform">💰</div>
+                                                <div class="text-orange-600 font-medium">ກົດເພື່ອເລືອກຫຼັກຖານການຊຳລະ</div>
+                                                <div class="text-sm text-gray-500 mt-1">ຫຼື ລາກໄຟລ໌ມາວາງບ່ອນນີ້</div>
+                                            </div>
+                                        </label>
+                                    </div>
+                                    <div class="form-error"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Submit Button -->
+                        <div class="text-center pt-4">
+                            <button type="submit" class="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-bold text-lg px-12 py-4 rounded-2xl shadow-2xl hover:shadow-blue-500/25 transform hover:scale-105 transition-all duration-300 flex items-center gap-3 mx-auto">
+                                <span class="text-xl">✅</span>
+                                <span>ສົ່ງການລົງທະບຽນ</span>
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"></path>
+                                </svg>
+                            </button>
+                            <p class="text-gray-500 text-sm mt-4">
+                                ການກົດສົ່ງໝາຍຄວາມວ່າທ່ານຍອມຮັບເງື່ອນໄຂການໃຫ້ບໍລິການ
+                            </p>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </section>
+
+        <!-- Check Status Section -->
+        <section id="check-status" class="mb-12">
+            <div class="text-center mb-12">
+                <div class="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-emerald-600 to-teal-600 text-white rounded-2xl mb-6">
+                    <span class="text-2xl">🔍</span>
+                </div>
+                <h2 class="text-4xl font-bold text-gray-800 mb-4 lao-text">ກວດສອບສະຖານະການລົງທະບຽນ</h2>
+                <p class="text-gray-600 text-lg max-w-2xl mx-auto">ໃສ່ລະຫັດນັກສຶກສາ ຫຼື ອີເມລ ເພື່ອກວດສອບສະຖານະການລົງທະບຽນຂອງທ່ານ</p>
+            </div>
+            <div class="bg-white rounded-3xl shadow-2xl border border-gray-100 overflow-hidden">
+                <div class="bg-gradient-to-r from-emerald-50 to-teal-50 px-8 py-6 border-b border-emerald-100">
+                    <div class="flex items-center gap-3">
+                        <div class="w-2 h-2 bg-emerald-500 rounded-full"></div>
+                        <div class="w-2 h-2 bg-teal-500 rounded-full"></div>
+                        <div class="w-2 h-2 bg-cyan-500 rounded-full"></div>
+                        <span class="text-gray-600 ml-4 font-medium">ການຄົ້ນຫາຂໍ້ມູນ</span>
+                    </div>
+                </div>
+                <div class="p-8">
+                    <form id="status-check-form" class="mb-8">
+                        <div class="bg-gradient-to-r from-emerald-50 to-teal-50 rounded-2xl p-6">
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                                <div class="form-group">
+                                    <label class="form-label lao-text text-gray-700 font-medium mb-2 flex items-center gap-2">
+                                        <span class="text-emerald-500">🆔</span> ລະຫັດນັກສຶກສາ
+                                    </label>
+                                    <input type="text" name="student_code" class="form-input bg-white border-2 border-gray-200 rounded-xl px-4 py-3 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-100 transition-all" placeholder="STU2025001">
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label lao-text text-gray-700 font-medium mb-2 flex items-center gap-2">
+                                        <span class="text-emerald-500">📧</span> ຫຼື ອີເມລ
+                                    </label>
+                                    <input type="email" name="email" class="form-input bg-white border-2 border-gray-200 rounded-xl px-4 py-3 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-100 transition-all" placeholder="example@email.com">
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">&nbsp;</label>
+                                    <button type="submit" class="bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-bold px-8 py-3 rounded-xl shadow-lg hover:shadow-emerald-500/25 transform hover:scale-105 transition-all duration-300 w-full flex items-center justify-center gap-2">
+                                        <span>🔍</span>
+                                        <span>ຊອກຫາ</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                    
+                    <div id="status-results" class="hidden">
+                        <div class="bg-white rounded-3xl shadow-xl border border-gray-100 p-8 mb-8">
+                            <h3 class="text-2xl font-bold mb-6 text-center bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent flex items-center justify-center gap-3">
+                                <span>📋</span> ຜົນການຄົ້ນຫາ / Search Results
+                            </h3>
+                            <div class="overflow-x-auto bg-gradient-to-br from-emerald-50 to-teal-50 rounded-2xl p-6">
+                                <table class="w-full border-collapse">
+                                    <thead>
+                                        <tr class="border-b-2 border-emerald-200">
+                                            <th class="text-left py-4 px-6 font-bold text-gray-700 bg-gradient-to-r from-emerald-100 to-teal-100 rounded-tl-xl">ລະຫັດນັກສຶກສາ</th>
+                                            <th class="text-left py-4 px-6 font-bold text-gray-700 bg-gradient-to-r from-emerald-100 to-teal-100">ຊື່ - ນາມສະກຸນ</th>
+                                            <th class="text-left py-4 px-6 font-bold text-gray-700 bg-gradient-to-r from-emerald-100 to-teal-100">ສາຂາວິຊາ</th>
+                                            <th class="text-left py-4 px-6 font-bold text-gray-700 bg-gradient-to-r from-emerald-100 to-teal-100">ສະຖານະ</th>
+                                            <th class="text-left py-4 px-6 font-bold text-gray-700 bg-gradient-to-r from-emerald-100 to-teal-100 rounded-tr-xl">ວັນທີລົງທະບຽນ</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="status-table-body" class="bg-white">
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-gradient-to-r from-gray-900 via-gray-800 to-gray-900 text-white py-12 mt-16">
+        <div class="container mx-auto px-4 text-center">
+            <div class="mb-6">
+                <div class="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-blue-600 to-purple-600 rounded-full mb-4">
+                    <span class="text-2xl">🎓</span>
+                </div>
+            </div>
+            <p class="lao-text text-lg mb-2 text-gray-100">&copy; 2025 ລະບົບລົງທະບຽນຮັບໃບປະກາດນິຍະບັດ ວິທະຍາໄລຄູສົງ ອົງຕື້</p>
+            <p class="text-gray-300 mb-4">Certificate Registration System</p>
+            <div class="flex justify-center space-x-6 text-sm text-gray-400 mb-4">
+                <span>📧 info@ontue-ttc.edu.la</span>
+                <span>📞 +856 2077772338</span>
+            </div>
+            <div class="border-t border-gray-700 pt-4">
+                <p class="text-gray-400">ພັດທະນາໂດຍ <span class="text-blue-400 font-semibold">ປອ ອານັນທະສັກ ພັດທະສີລາ</span> 🤖</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="js/api.js"></script>
+    <script>
+        // Mobile menu toggle
+        document.getElementById('mobile-menu-btn').addEventListener('click', () => {
+            const mobileMenu = document.getElementById('mobile-menu');
+            mobileMenu.classList.toggle('hidden');
+        });
+
+        // Smooth scroll to section
+        function scrollToSection(sectionId) {
+            document.getElementById(sectionId).scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // File upload preview
+        function setupFileUpload(inputId, labelId) {
+            const input = document.getElementById(inputId);
+            const label = document.querySelector(`label[for="${inputId}"]`);
+            
+            input.addEventListener('change', (e) => {
+                const file = e.target.files[0];
+                if (file) {
+                    label.querySelector('.file-upload-text').textContent = `✅ ${file.name}`;
+                    label.style.borderColor = '#10b981';
+                    label.style.backgroundColor = '#d1fae5';
+                }
+            });
+        }
+
+        setupFileUpload('profile-upload');
+        setupFileUpload('payment-upload');
+
+        // Registration form submission
+        document.getElementById('registration-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            if (!UIUtils.validateForm('registration-form')) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'ຂໍ້ມູນບໍ່ຄົບຖ້ວນ!',
+                    text: 'ກະລຸນາຕື່ມຂໍ້ມູນທີ່ຈຳເປັນໃຫ້ຄົບຖ້ວນ',
+                    confirmButtonText: 'ຕົກລົງ',
+                    confirmButtonColor: '#f59e0b',
+                    customClass: {
+                        popup: 'rounded-xl shadow-xl'
+                    }
+                });
+                return;
+            }
+
+            const submitBtn = e.target.querySelector('button[type="submit"]');
+            const hideLoading = UIUtils.showLoading(submitBtn);
+
+            try {
+                const formData = new FormData(e.target);
+                const result = await api.registerStudent(formData);
+
+                if (result.success) {
+                    // แสดง SweetAlert2 เมื่อลงทะเบียนสำเร็จ
+                    await Swal.fire({
+                        icon: 'success',
+                        title: 'ລົງທະບຽນສຳເລັດ!',
+                        html: `
+                            <div class="text-center">
+                                <div class="mb-4">
+                                    <div class="inline-flex items-center justify-center w-16 h-16 bg-green-100 rounded-full mb-4">
+                                        <span class="text-3xl">🎓</span>
+                                    </div>
+                                </div>
+                                <p class="text-lg mb-4 text-gray-700">ການລົງທະບຽນຂອງທ່ານສຳເລັດແລ້ວ</p>
+                                <div class="bg-blue-50 border-l-4 border-blue-400 p-4 mb-4 rounded-lg">
+                                    <p class="text-sm text-gray-600 mb-2">ລະຫັດຕິດຕາມການລົງທະບຽນ:</p>
+                                    <div class="flex items-center justify-center gap-2">
+                                        <p id="student-code-display" class="text-2xl font-bold text-blue-600">${result.data.student_code}</p>
+                                        <button onclick="copyStudentCode('${result.data.student_code}')" class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-sm transition-colors">
+                                            📋 ຄັດລອກ
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="bg-green-50 border-l-4 border-green-400 p-4 mb-4 rounded-lg">
+                                    <p class="text-sm text-gray-600 mb-2">📱 ເຂົ້າກຸ່ມ WhatsApp ເພື່ອຮັບຂ່າວສານ:</p>
+                                    <div class="flex items-center justify-center gap-2">
+                                        <a href="https://chat.whatsapp.com/your-group-link" target="_blank" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg text-sm transition-colors flex items-center gap-2">
+                                            <span>📱</span> ເຂົ້າກຸ່ມ WhatsApp
+                                        </a>
+                                        <button onclick="copyWhatsAppLink()" class="bg-gray-500 hover:bg-gray-600 text-white px-3 py-2 rounded text-sm transition-colors">
+                                            📋 ຄັດລອກລິ້ງ
+                                        </button>
+                                    </div>
+                                </div>
+                                <p class="text-sm text-gray-500">ກະລຸນາບັນທຶກລະຫັດນີ້ໄວ້ສຳລັບການກວດສອບສະຖານະ</p>
+                            </div>
+                        `,
+                        confirmButtonText: '✅ ຕົກລົງ',
+                        confirmButtonColor: '#10b981',
+                        showCancelButton: true,
+                        cancelButtonText: '📱 ເປີດ WhatsApp',
+                        cancelButtonColor: '#25d366',
+                        customClass: {
+                            popup: 'rounded-xl shadow-xl',
+                            confirmButton: 'px-8 py-3 rounded-lg font-medium',
+                            cancelButton: 'px-8 py-3 rounded-lg font-medium'
+                        },
+                        reverseButtons: true,
+                        showClass: {
+                            popup: 'animate__animated animate__fadeInUp animate__faster'
+                        },
+                        hideClass: {
+                            popup: 'animate__animated animate__fadeOutDown animate__faster'
+                        }
+                    }).then((result) => {
+                        // ถ้าผู้ใช้คลิกปุ่ม WhatsApp (Cancel button)
+                        if (result.dismiss === Swal.DismissReason.cancel) {
+                            window.open('https://chat.whatsapp.com/your-group-link', '_blank');
+                        }
+                    });
+                    
+                    e.target.reset();
+                    // Reset file upload labels
+                    document.querySelectorAll('.file-upload-label .file-upload-text').forEach(text => {
+                        text.textContent = text.textContent.includes('ໂປຣໄຟລ໌') ? '📷 ກົດເພື່ອເລືອກຮູບໂປຣໄຟລ໌' : '💰 ກົດເພື່ອເລືອກຫຼັກຖານການຊຳລະ';
+                    });
+                    // รีเฟรชจำนวนผู้ลงทะเบียน
+                    refreshRegistrationCount();
+                } else {
+                    // แสดง SweetAlert2 เมื่อเกิดข้อผิดพลาด
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'ເກີດຂໍ້ຜິດພາດ!',
+                        text: result.message || 'ເກີດຂໍ້ຜິດພາດໃນການລົງທະບຽນ',
+                        confirmButtonText: 'ຕົກລົງ',
+                        confirmButtonColor: '#ef4444',
+                        customClass: {
+                            popup: 'rounded-xl shadow-xl'
+                        }
+                    });
+                }
+            } catch (error) {
+                console.error('Registration error:', error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'ຂໍ້ຜິດພາດການເຊື່ອມຕໍ່!',
+                    text: 'ເກີດຂໍ້ຜິດພາດໃນການເຊື່ອມຕໍ່ລະບົບ ກະລຸນາລອງໃໝ່ອີກຄັ້ງ',
+                    confirmButtonText: 'ຕົກລົງ',
+                    confirmButtonColor: '#ef4444',
+                    customClass: {
+                        popup: 'rounded-xl shadow-xl'
+                    }
+                });
+            } finally {
+                hideLoading();
+            }
+        });
+
+        // Status check form submission
+        document.getElementById('status-check-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const formData = new FormData(e.target);
+            const studentCode = formData.get('student_code');
+            const email = formData.get('email');
+            
+            if (!studentCode && !email) {
+                UIUtils.showAlert('ກະລຸນາໃສ່ລະຫັດນັກສຶກສາ ຫຼື ອີເມລ', 'error');
+                return;
+            }
+
+            const submitBtn = e.target.querySelector('button[type="submit"]');
+            const hideLoading = UIUtils.showLoading(submitBtn);
+
+            try {
+                const result = await api.checkStatus(studentCode, email);
+                
+                if (result.success) {
+                    displayStatusResults(result.registrations);
+                } else {
+                    UIUtils.showAlert(result.message, 'warning');
+                    document.getElementById('status-results').classList.add('hidden');
+                }
+            } catch (error) {
+                console.error('Status check error:', error);
+                UIUtils.showAlert('ເກີດຂໍ້ຜິດພາດໃນການກວດສອບ', 'error');
+            } finally {
+                hideLoading();
+            }
+        });
+
+        function displayStatusResults(registrations) {
+            const tableBody = document.getElementById('status-table-body');
+            const resultsDiv = document.getElementById('status-results');
+            
+            tableBody.innerHTML = '';
+            
+            registrations.forEach(reg => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td class="font-mono">${reg.student_code}</td>
+                    <td>${reg.first_name} ${reg.last_name}</td>
+                    <td>${reg.major}</td>
+                    <td>${UIUtils.getStatusBadge(reg.status)}</td>
+                    <td>${UIUtils.formatDateLao(reg.created_at)}</td>
+                `;
+                tableBody.appendChild(row);
+            });
+            
+            resultsDiv.classList.remove('hidden');
+        }
+
+        // ฟังก์ชันคัดลอกรหัสติดตาม
+        window.copyStudentCode = function(studentCode) {
+            navigator.clipboard.writeText(studentCode).then(() => {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'ຄັດລອກສຳເລັດ!',
+                    text: `ລະຫັດ ${studentCode} ຖືກຄັດລອກແລ້ວ`,
+                    timer: 1500,
+                    showConfirmButton: false,
+                    toast: true,
+                    position: 'top-end',
+                    customClass: {
+                        popup: 'colored-toast'
+                    }
+                });
+            }).catch(() => {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'ຄັດລອກບໍ່ສຳເລັດ!',
+                    text: 'ກະລຸນາຄັດລອກດ້ວຍຕົນເອງ',
+                    timer: 2000,
+                    showConfirmButton: false
+                });
+            });
+        };
+
+        // ฟังก์ชันคัดลอกลิงก์ WhatsApp
+        window.copyWhatsAppLink = function() {
+            const whatsappLink = "https://chat.whatsapp.com/your-group-link";
+            navigator.clipboard.writeText(whatsappLink).then(() => {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'ຄັດລອກລິ້ງສຳເລັດ!',
+                    text: 'ລິ້ງກຸ່ມ WhatsApp ຖືກຄັດລອກແລ້ວ',
+                    timer: 1500,
+                    showConfirmButton: false,
+                    toast: true,
+                    position: 'top-end',
+                    customClass: {
+                        popup: 'colored-toast'
+                    }
+                });
+            }).catch(() => {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'ຄັດລອກບໍ່ສຳເລັດ!',
+                    text: 'ກະລຸນາຄັດລອກລິ້ງດ້ວຍຕົນເອງ',
+                    timer: 2000,
+                    showConfirmButton: false
+                });
+            });
+        };
+
+        // ฟังก์ชันโหลดจำนวนผู้ลงทะเบียน
+        async function loadRegistrationCount() {
+            try {
+                // เรียก API เพื่อดึงจำนวนการลงทะเบียนทั้งหมด
+                const response = await fetch('/backend/api/get_count.php', {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (response.ok) {
+                    const result = await response.json();
+                    if (result.success) {
+                        // อัปเดตจำนวนผู้ลงทะเบียนทั้งหมด
+                        const countElement = document.querySelector('#registration-count span.font-bold');
+                        if (countElement) {
+                            // แอนิเมชันการเปลี่ยนจำนวน
+                            countElement.style.transform = 'scale(1.2)';
+                            countElement.style.transition = 'transform 0.3s ease';
+                            
+                            setTimeout(() => {
+                                countElement.textContent = result.count.toLocaleString();
+                                countElement.style.transform = 'scale(1)';
+                            }, 150);
+                        }
+
+                        // อัปเดตสถิติแยกตามสถานะ
+                        if (result.status_stats && result.count > 0) {
+                            updateStatusStats(result.status_stats);
+                            // แสดงสถิติถ้ามีข้อมูล
+                            const statsContainer = document.getElementById('registration-stats');
+                            if (statsContainer) {
+                                statsContainer.classList.remove('hidden');
+                            }
+                        }
+
+                        // อัปเดตเวลาอัปเดตล่าสุด
+                        updateLastUpdatedTime();
+                    }
+                }
+            } catch (error) {
+                console.error('Failed to load registration count:', error);
+                // ถ้าเกิดข้อผิดพลาด ให้แสดงข้อความเริ่มต้น
+                const countElement = document.querySelector('#registration-count span.font-bold');
+                if (countElement && countElement.textContent === '0') {
+                    countElement.textContent = '--';
+                }
+            }
+        }
+
+        // ฟังก์ชันอัปเดตสถิติตามสถานะ
+        function updateStatusStats(statusStats) {
+            const statusMapping = {
+                'pending': 'pending-count',
+                'approved': 'approved-count', 
+                'rejected': 'rejected-count',
+                'certificate_issued': 'certificate-count'
+            };
+
+            // อัปเดตแต่ละสถานะ
+            Object.keys(statusMapping).forEach(status => {
+                const elementId = statusMapping[status];
+                const element = document.getElementById(elementId);
+                if (element) {
+                    const count = statusStats[status] || 0;
+                    const strongElement = element.querySelector('strong');
+                    if (strongElement) {
+                        strongElement.textContent = count.toLocaleString();
+                    }
+                    
+                    // เปลี่ยนสีตามจำนวน
+                    if (count > 0) {
+                        element.style.opacity = '1';
+                        element.classList.add('animate-pulse');
+                        setTimeout(() => {
+                            element.classList.remove('animate-pulse');
+                        }, 1000);
+                    } else {
+                        element.style.opacity = '0.5';
+                    }
+                }
+            });
+        }
+
+        // โหลดจำนวนผู้ลงทะเบียนเมื่อหน้าเว็บโหลดเสร็จ
+        document.addEventListener('DOMContentLoaded', function() {
+            loadRegistrationCount();
+            
+            // โหลดข้อมูลใหม่ทุก 30 วินาที
+            setInterval(loadRegistrationCount, 30000);
+        });
+
+        // โหลดข้อมูลใหม่หลังจากลงทะเบียนสำเร็จ
+        function refreshRegistrationCount() {
+            setTimeout(loadRegistrationCount, 1000); // รอ 1 วินาทีหลังจากลงทะเบียนสำเร็จ
+        }
+
+        // ฟังก์ชันอัปเดตเวลาอัปเดตล่าสุด
+        function updateLastUpdatedTime() {
+            const now = new Date();
+            const timeString = now.toLocaleTimeString('th-TH', {
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit'
+            });
+            
+            const updateTimeElement = document.getElementById('update-time');
+            const lastUpdatedElement = document.getElementById('last-updated');
+            
+            if (updateTimeElement && lastUpdatedElement) {
+                updateTimeElement.textContent = timeString;
+                lastUpdatedElement.classList.remove('hidden');
+                
+                // แอนิเมชันสั้นๆ
+                updateTimeElement.style.color = '#fbbf24'; // yellow-400
+                setTimeout(() => {
+                    updateTimeElement.style.color = 'inherit';
+                }, 1000);
+            }
+        }
+    </script>
+</body>
+</html>
