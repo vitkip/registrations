@@ -7,6 +7,162 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="css/style.css">
     <link rel="shortcut icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📊</text></svg>">
+    
+    <!-- Dashboard Pagination Styles -->
+    <style>
+        /* Pagination Styles */
+        .pagination-container {
+            border-top: 1px solid #e5e7eb;
+            padding-top: 1rem;
+            background: #f9fafb;
+            border-radius: 0 0 0.5rem 0.5rem;
+            margin: 0 -1.5rem -1.5rem -1.5rem;
+            padding-left: 1.5rem;
+            padding-right: 1.5rem;
+            padding-bottom: 1rem;
+        }
+
+        .pagination-btn {
+            padding: 0.5rem 0.75rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: #374151;
+            background-color: white;
+            border: 1px solid #d1d5db;
+            border-radius: 0.5rem;
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+
+        .pagination-btn:hover {
+            background-color: #f9fafb;
+            color: #111827;
+        }
+
+        .pagination-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .pagination-btn:disabled:hover {
+            background-color: white;
+            color: #374151;
+        }
+
+        .pagination-btn.active {
+            background-color: #2563eb;
+            color: white;
+            border-color: #2563eb;
+        }
+
+        .pagination-btn.active:hover {
+            background-color: #1d4ed8;
+        }
+
+        .pagination-btn-sm {
+            padding: 0.25rem 0.5rem;
+            font-size: 0.75rem;
+        }
+
+        .page-number {
+            width: 2.5rem;
+            height: 2.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: #374151;
+            background-color: white;
+            border: 1px solid #d1d5db;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .page-number:hover {
+            background-color: #f9fafb;
+        }
+
+        .page-number.active {
+            background-color: #2563eb;
+            color: white;
+            border-color: #2563eb;
+        }
+
+        .page-number.ellipsis {
+            cursor: default;
+        }
+
+        .page-number.ellipsis:hover {
+            background-color: white;
+        }
+
+        .pagination-info {
+            font-size: 0.875rem;
+            color: #4b5563;
+            font-weight: 500;
+        }
+
+        /* Loading Animation */
+        .spinner {
+            display: inline-block;
+            width: 1rem;
+            height: 1rem;
+            border: 2px solid #e5e7eb;
+            border-top: 2px solid #2563eb;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Responsive Pagination */
+        @media (max-width: 768px) {
+            .pagination-controls {
+                flex-direction: column;
+                gap: 1rem;
+            }
+            
+            .pagination-nav {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+            
+            .pagination-jump {
+                margin-left: 0 !important;
+                margin-top: 0.5rem;
+            }
+        }
+
+        /* Table Loading State */
+        .table-loading {
+            opacity: 0.6;
+            pointer-events: none;
+        }
+
+        /* Enhanced Table Styles */
+        .table th {
+            background-color: #f9fafb;
+            font-weight: 600;
+            color: #374151;
+            text-align: left;
+            padding: 0.75rem 1rem;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .table td {
+            padding: 0.75rem 1rem;
+            border-bottom: 1px solid #f3f4f6;
+        }
+
+        .table tbody tr:hover {
+            background-color: #f9fafb;
+        }
+    </style>
 </head>
 <body class="bg-gray-50">
     <!-- Navigation -->
@@ -113,9 +269,34 @@
         <div class="card">
             <div class="card-header flex justify-between items-center">
                 <h2 class="text-xl font-bold lao-text">ການລົງທະບຽນລ່າສຸດ</h2>
-                <a href="admin-registrations.html" class="text-white/80 hover:text-white text-sm">ເບິ່ງທັງໝົດ →</a>
+                <div class="flex items-center gap-4">
+                    <div class="pagination-info text-sm text-white/80">
+                        <span id="pagination-info-text">-</span>
+                    </div>
+                    <a href="admin-registrations.html" class="text-white/80 hover:text-white text-sm">ເບິ່ງທັງໝົດ →</a>
+                </div>
             </div>
             <div class="card-body">
+                <!-- Pagination Controls (Top) -->
+                <div class="pagination-controls mb-4 flex flex-wrap items-center justify-between gap-4">
+                    <div class="flex items-center gap-3">
+                        <span class="text-sm text-gray-600">ສະແດງ</span>
+                        <select id="page-size-selector" class="px-3 py-1 border border-gray-300 rounded-lg text-sm bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                            <option value="10" selected>10</option>
+                            <option value="25">25</option>
+                            <option value="50">50</option>
+                            <option value="100">100</option>
+                        </select>
+                        <span class="text-sm text-gray-600">ລາຍການຕໍ່ໜ້າ</span>
+                    </div>
+                    
+                    <div class="flex items-center gap-2">
+                        <button id="refresh-btn" onclick="loadDashboardData()" class="px-3 py-2 bg-blue-50 hover:bg-blue-100 text-blue-600 rounded-lg text-sm font-medium transition-colors">
+                            🔄 ອັບເດດ
+                        </button>
+                    </div>
+                </div>
+
                 <div class="table-container">
                     <table class="table">
                         <thead>
@@ -137,6 +318,41 @@
                             </tr>
                         </tbody>
                     </table>
+                </div>
+
+                <!-- Pagination Controls (Bottom) -->
+                <div id="pagination-container" class="pagination-container hidden">
+                    <div class="pagination-controls mt-4 flex flex-wrap items-center justify-between gap-4">
+                        <div class="pagination-info text-sm text-gray-600">
+                            <span id="pagination-info">ສະແດງ 1-10 ຈາກ 0 ລາຍການ</span>
+                        </div>
+                        
+                        <div class="pagination-nav flex items-center gap-2">
+                            <button id="first-page-btn" onclick="goToPage(1)" class="pagination-btn" disabled>
+                                ໜ້າແລກ
+                            </button>
+                            <button id="prev-page-btn" onclick="goToPage(currentPage - 1)" class="pagination-btn" disabled>
+                                ໜ້າກ່ອນໜ້າ
+                            </button>
+                            
+                            <div id="page-numbers" class="flex items-center gap-1">
+                                <!-- Page numbers will be generated here -->
+                            </div>
+                            
+                            <button id="next-page-btn" onclick="goToPage(currentPage + 1)" class="pagination-btn" disabled>
+                                ໜ້າຕໍ່ໄປ
+                            </button>
+                            <button id="last-page-btn" onclick="goToPage(totalPages)" class="pagination-btn" disabled>
+                                ໜ້າສຸດທ້າຍ
+                            </button>
+                            
+                            <div class="pagination-jump ml-4 flex items-center gap-2">
+                                <span class="text-sm text-gray-600">ໄປຍັງໜ້າ:</span>
+                                <input type="number" id="page-jump-input" min="1" max="1" class="w-16 px-2 py-1 border border-gray-300 rounded text-sm text-center" placeholder="1">
+                                <button onclick="jumpToPage()" class="pagination-btn pagination-btn-sm">ໄປ</button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -190,6 +406,13 @@
     <script src="js/api.js"></script>
     <script>
         let userInfo = null;
+        
+        // Pagination Variables
+        let currentPage = 1;
+        let currentPageSize = 10;
+        let totalPages = 1;
+        let totalRecords = 0;
+        let allRegistrations = [];
 
         // Check authentication
         async function checkAuth() {
@@ -219,10 +442,12 @@
             }
         }
 
-        // Load dashboard data
+        // Load dashboard data with pagination
         async function loadDashboardData() {
+            showTableLoading(true);
+            
             try {
-                const result = await api.getRegistrations(1, 10);
+                const result = await api.getRegistrations(currentPage, currentPageSize);
                 
                 if (result.success) {
                     // Update statistics
@@ -233,12 +458,24 @@
                     document.getElementById('approved-registrations').textContent = stats.approved || 0;
                     document.getElementById('issued-registrations').textContent = stats.certificate_issued || 0;
                     
+                    // Update pagination data
+                    allRegistrations = result.registrations || [];
+                    totalRecords = result.total || allRegistrations.length;
+                    totalPages = Math.ceil(totalRecords / currentPageSize);
+                    
                     // Update recent registrations table
-                    displayRecentRegistrations(result.registrations);
+                    displayRecentRegistrations(allRegistrations);
+                    
+                    // Update pagination display
+                    displayPagination();
+                } else {
+                    UIUtils.showAlert(result.message || 'ເກີດຂໍ້ຜິດພາດໃນການໂຫລດຂໍ້ມູນ', 'error');
                 }
             } catch (error) {
                 console.error('Failed to load dashboard data:', error);
                 UIUtils.showAlert('ເກີດຂໍ້ຜິດພາດໃນການໂຫລດຂໍ້ມູນ', 'error');
+            } finally {
+                showTableLoading(false);
             }
         }
 
@@ -247,6 +484,7 @@
             
             if (!registrations || registrations.length === 0) {
                 tbody.innerHTML = '<tr><td colspan="7" class="text-center py-8 text-gray-500">ບໍ່ມີຂໍ້ມູນການລົງທະບຽນ</td></tr>';
+                document.getElementById('pagination-container').classList.add('hidden');
                 return;
             }
 
@@ -271,6 +509,112 @@
             `).join('');
         }
 
+        // Show/hide table loading state
+        function showTableLoading(show) {
+            const table = document.querySelector('.table-container');
+            if (show) {
+                table.classList.add('table-loading');
+            } else {
+                table.classList.remove('table-loading');
+            }
+        }
+
+        // Display pagination controls
+        function displayPagination() {
+            if (totalRecords <= currentPageSize) {
+                document.getElementById('pagination-container').classList.add('hidden');
+                return;
+            }
+
+            document.getElementById('pagination-container').classList.remove('hidden');
+            
+            // Update pagination info
+            const start = (currentPage - 1) * currentPageSize + 1;
+            const end = Math.min(currentPage * currentPageSize, totalRecords);
+            
+            document.getElementById('pagination-info').textContent = 
+                `ສະແດງ ${start}-${end} ຈາກ ${totalRecords} ລາຍການ`;
+            document.getElementById('pagination-info-text').textContent = 
+                `${totalRecords} ລາຍການທັງໝົດ`;
+
+            // Update navigation buttons
+            document.getElementById('first-page-btn').disabled = currentPage === 1;
+            document.getElementById('prev-page-btn').disabled = currentPage === 1;
+            document.getElementById('next-page-btn').disabled = currentPage === totalPages;
+            document.getElementById('last-page-btn').disabled = currentPage === totalPages;
+
+            // Update page jump input
+            const jumpInput = document.getElementById('page-jump-input');
+            jumpInput.max = totalPages;
+            jumpInput.placeholder = currentPage.toString();
+
+            // Generate page numbers
+            generatePageNumbers();
+        }
+
+        // Generate page number buttons with smart truncation
+        function generatePageNumbers() {
+            const container = document.getElementById('page-numbers');
+            const maxVisible = 5;
+            const pages = [];
+
+            if (totalPages <= maxVisible) {
+                // Show all pages if total is small
+                for (let i = 1; i <= totalPages; i++) {
+                    pages.push(i);
+                }
+            } else {
+                // Smart truncation logic
+                if (currentPage <= 3) {
+                    pages.push(1, 2, 3, 4, '...', totalPages);
+                } else if (currentPage >= totalPages - 2) {
+                    pages.push(1, '...', totalPages - 3, totalPages - 2, totalPages - 1, totalPages);
+                } else {
+                    pages.push(1, '...', currentPage - 1, currentPage, currentPage + 1, '...', totalPages);
+                }
+            }
+
+            container.innerHTML = pages.map(page => {
+                if (page === '...') {
+                    return '<span class="page-number ellipsis">...</span>';
+                }
+                
+                const isActive = page === currentPage;
+                return `<button class="page-number ${isActive ? 'active' : ''}" 
+                               onclick="goToPage(${page})">${page}</button>`;
+            }).join('');
+        }
+
+        // Go to specific page
+        function goToPage(page) {
+            if (page < 1 || page > totalPages || page === currentPage) return;
+            
+            currentPage = page;
+            loadDashboardData();
+        }
+
+        // Jump to page from input
+        function jumpToPage() {
+            const input = document.getElementById('page-jump-input');
+            const page = parseInt(input.value);
+            
+            if (isNaN(page) || page < 1 || page > totalPages) {
+                input.value = '';
+                input.placeholder = currentPage.toString();
+                return;
+            }
+            
+            goToPage(page);
+            input.value = '';
+        }
+
+        // Change page size
+        function changePageSize(newSize) {
+            currentPageSize = parseInt(newSize);
+            currentPage = 1; // Reset to first page
+            loadDashboardData();
+        }
+
         // Update registration status
         async function updateStatus(id, status) {
             if (!confirm(`ທ່ານແນ່ໃຈບໍ່ວ່າຕ້ອງການ${status === 'approved' ? 'ອະນຸມັດ' : 'ປະຕິເສດ'}ການລົງທະບຽນນີ້?`)) {
@@ -282,7 +626,8 @@
                 
                 if (result.success) {
                     UIUtils.showAlert('ປັບປຸງສະຖານະສຳເລັດ', 'success');
-                    loadDashboardData(); // Reload data
+                    // Reload current page to reflect changes
+                    loadDashboardData();
                 } else {
                     UIUtils.showAlert(result.message || 'ເກີດຂໍ້ຜິດພາດ', 'error');
                 }
@@ -348,7 +693,41 @@
         document.addEventListener('DOMContentLoaded', async () => {
             await checkAuth();
             await loadDashboardData();
+            
+            // Setup pagination event listeners
+            setupPaginationListeners();
         });
+
+        // Setup pagination event listeners
+        function setupPaginationListeners() {
+            // Page size selector
+            document.getElementById('page-size-selector').addEventListener('change', (e) => {
+                changePageSize(e.target.value);
+            });
+
+            // Page jump input - Enter key
+            document.getElementById('page-jump-input').addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    jumpToPage();
+                }
+            });
+
+            // Keyboard shortcuts for navigation
+            document.addEventListener('keydown', (e) => {
+                if (e.ctrlKey || e.metaKey) {
+                    switch (e.key) {
+                        case 'ArrowLeft':
+                            e.preventDefault();
+                            if (currentPage > 1) goToPage(currentPage - 1);
+                            break;
+                        case 'ArrowRight':
+                            e.preventDefault();
+                            if (currentPage < totalPages) goToPage(currentPage + 1);
+                            break;
+                    }
+                }
+            });
+        }
     </script>
 </body>
 </html>

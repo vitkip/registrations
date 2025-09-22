@@ -9,6 +9,91 @@
     <link rel="shortcut icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📋</text></svg>">
     <!-- SweetAlert2 -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    
+    <style>
+        /* Enhanced Pagination Styles */
+        .pagination-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 2.5rem;
+            height: 2.5rem;
+            padding: 0.5rem;
+            margin: 0 0.125rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: #374151;
+            background-color: white;
+            border: 1px solid #d1d5db;
+            border-radius: 0.5rem;
+            transition: all 0.2s ease-in-out;
+            cursor: pointer;
+            text-decoration: none;
+        }
+
+        .pagination-btn:hover:not(.disabled) {
+            background-color: #f9fafb;
+            border-color: #3b82f6;
+            color: #3b82f6;
+            transform: translateY(-1px);
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+        }
+
+        .pagination-btn.active {
+            background: linear-gradient(135deg, #3b82f6, #2563eb);
+            color: white;
+            border-color: #3b82f6;
+            font-weight: 600;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        .pagination-btn.disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            background-color: #f3f4f6;
+            color: #9ca3af;
+        }
+
+        .pagination-btn.disabled:hover {
+            transform: none;
+            box-shadow: none;
+            background-color: #f3f4f6;
+            border-color: #d1d5db;
+            color: #9ca3af;
+        }
+
+        /* Loading state for table */
+        .table-loading {
+            opacity: 0.6;
+            pointer-events: none;
+        }
+
+        /* Page size selector enhanced styles */
+        #page-size-selector {
+            font-size: 0.875rem;
+            border-radius: 0.5rem;
+        }
+
+        #page-size-selector:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
+        }
+
+        /* Responsive pagination */
+        @media (max-width: 640px) {
+            .pagination-btn {
+                min-width: 2.25rem;
+                height: 2.25rem;
+                font-size: 0.75rem;
+                margin: 0 0.0625rem;
+            }
+            
+            .pagination-btn span {
+                display: none;
+            }
+        }
+    </style>
 </head>
 <body class="bg-gray-50">
     <!-- Navigation -->
@@ -73,11 +158,31 @@
 
         <!-- Registrations Table -->
         <div class="card">
-            <div class="card-header flex justify-between items-center">
-                <h2 class="text-xl font-bold lao-text">ລາຍການການລົງທະບຽນ</h2>
-                <div class="flex gap-2">
-                    <button onclick="showExportModal()" class="btn-secondary">📊 ສົ່ງອອກ</button>
-                    <button onclick="refreshData()" class="btn-primary">🔄 ໂຫລດໃໝ່</button>
+            <div class="card-header">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-xl font-bold lao-text">ລາຍການການລົງທະບຽນ</h2>
+                    <div class="flex gap-2">
+                        <button onclick="showExportModal()" class="btn-secondary">📊 ສົ່ງອອກ</button>
+                        <button onclick="refreshData()" class="btn-primary">🔄 ໂຫລດໃໝ່</button>
+                    </div>
+                </div>
+                
+                <!-- Page Size Selector -->
+                <div class="flex items-center gap-4 text-sm text-gray-600">
+                    <div class="flex items-center gap-2">
+                        <label class="font-medium">ສະແດງ:</label>
+                        <select id="page-size-selector" onchange="changePageSize()" class="px-3 py-1 border border-gray-300 rounded-lg focus:border-blue-500 focus:ring-2 focus:ring-blue-100 bg-white">
+                            <option value="10" selected>10 ລາຍການ</option>
+                            <option value="25">25 ລາຍການ</option>
+                            <option value="50">50 ລາຍການ</option>
+                            <option value="100">100 ລາຍການ</option>
+                        </select>
+                        <span>ຕໍ່ໜ້າ</span>
+                    </div>
+                    
+                    <div id="total-records-info" class="text-gray-500">
+                        <!-- Will be populated by JavaScript -->
+                    </div>
                 </div>
             </div>
             <div class="card-body">
@@ -208,6 +313,7 @@
     <script src="js/api.js"></script>
     <script>
         let currentPage = 1;
+        let currentPageSize = 10;
         let currentRegistration = null;
         let userInfo = null;
 
@@ -235,22 +341,34 @@
         }
 
         // Load registrations
-        async function loadRegistrations(page = 1) {
+        async function loadRegistrations(page = 1, pageSize = null) {
             currentPage = page;
+            if (pageSize) {
+                currentPageSize = pageSize;
+            }
             
             try {
                 const filters = getFilters();
-                const result = await api.getRegistrations(page, 20, filters);
+                const result = await api.getRegistrations(page, currentPageSize, filters);
                 
                 if (result.success) {
                     displayRegistrations(result.registrations);
                     displayPagination(result.pagination);
+                    
+                    // Update page size selector
+                    const selector = document.getElementById('page-size-selector');
+                    if (selector && selector.value != currentPageSize) {
+                        selector.value = currentPageSize;
+                    }
                 } else {
                     UIUtils.showAlert('ເກີດຂໍ້ຜິດພາດໃນການໂຫລດຂໍ້ມູນ', 'error');
                 }
             } catch (error) {
                 console.error('Failed to load registrations:', error);
                 UIUtils.showAlert('ເກີດຂໍ້ຜິດພາດໃນການໂຫລດຂໍ້ມູນ', 'error');
+            } finally {
+                // Always remove loading state
+                showTableLoading(false);
             }
         }
 
@@ -311,50 +429,174 @@
 
         function displayPagination(pagination) {
             const container = document.getElementById('pagination-container');
+            
+            // Update total records info in header
+            const totalInfoElement = document.getElementById('total-records-info');
+            const startRecord = ((pagination.current_page - 1) * pagination.per_page) + 1;
+            const endRecord = Math.min(pagination.current_page * pagination.per_page, pagination.total_records);
+            
+            totalInfoElement.innerHTML = `
+                <span class="flex items-center gap-2">
+                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                        ${pagination.total_records} ລາຍການທັງໝົດ
+                    </span>
+                    <span class="text-gray-400">|</span>
+                    <span>ສະແດງ ${startRecord}-${endRecord}</span>
+                </span>
+            `;
+            
             if (pagination.total_pages <= 1) {
-                container.innerHTML = '';
+                container.innerHTML = `
+                    <div class="flex justify-center items-center py-4">
+                        <span class="text-gray-500 text-sm">ໜ້າດຽວ (${pagination.total_records} ລາຍການ)</span>
+                    </div>
+                `;
                 return;
             }
 
-            let html = '<div class="flex justify-center items-center gap-2">';
+            let html = `
+                <div class="bg-white rounded-xl border border-gray-200 shadow-sm">
+                    <div class="flex flex-col sm:flex-row justify-between items-center gap-4 px-6 py-4">
+                        <!-- Left: Page Info -->
+                        <div class="flex items-center gap-2 text-sm text-gray-600">
+                            <span class="hidden sm:inline">ໜ້າ</span>
+                            <span class="font-semibold text-blue-600">${pagination.current_page}</span>
+                            <span class="hidden sm:inline">ຈາກ</span>
+                            <span class="font-semibold">${pagination.total_pages}</span>
+                        </div>
+                        
+                        <!-- Center: Navigation Controls -->
+                        <div class="flex items-center gap-1">
+            `;
+            
+            // First page button
+            if (pagination.current_page > 1) {
+                html += `
+                    <button onclick="loadRegistrations(1)" class="pagination-btn ${pagination.current_page === 1 ? 'disabled' : ''}" title="ໜ້າແລກ">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 19l-7-7 7-7M20 19l-7-7 7-7"/>
+                        </svg>
+                    </button>
+                `;
+            }
             
             // Previous button
-            if (pagination.current_page > 1) {
-                html += `<button onclick="loadRegistrations(${pagination.current_page - 1})" class="px-3 py-2 border border-gray-300 rounded hover:bg-gray-50">‹ ກ່ອນໜ້າ</button>`;
+            html += `
+                <button onclick="loadRegistrations(${pagination.current_page - 1})" 
+                        class="pagination-btn ${pagination.current_page <= 1 ? 'disabled' : ''}" 
+                        ${pagination.current_page <= 1 ? 'disabled' : ''} title="ໜ້າກ່ອນໜ້າ">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                    </svg>
+                </button>
+            `;
+
+            // Page numbers with smart truncation
+            const maxVisiblePages = 5;
+            let startPage = Math.max(1, pagination.current_page - Math.floor(maxVisiblePages / 2));
+            let endPage = Math.min(pagination.total_pages, startPage + maxVisiblePages - 1);
+            
+            // Adjust start if we're near the end
+            if (endPage - startPage + 1 < maxVisiblePages) {
+                startPage = Math.max(1, endPage - maxVisiblePages + 1);
             }
-
-            // Page numbers
-            const startPage = Math.max(1, pagination.current_page - 2);
-            const endPage = Math.min(pagination.total_pages, pagination.current_page + 2);
-
+            
+            // Show first page if not in range
+            if (startPage > 1) {
+                html += `<button onclick="loadRegistrations(1)" class="pagination-btn">1</button>`;
+                if (startPage > 2) {
+                    html += `<span class="px-2 text-gray-400">...</span>`;
+                }
+            }
+            
+            // Page number buttons
             for (let i = startPage; i <= endPage; i++) {
-                const activeClass = i === pagination.current_page ? 'bg-blue-600 text-white' : 'bg-white text-gray-700 hover:bg-gray-50';
-                html += `<button onclick="loadRegistrations(${i})" class="px-3 py-2 border border-gray-300 rounded ${activeClass}">${i}</button>`;
+                const isActive = i === pagination.current_page;
+                html += `
+                    <button onclick="loadRegistrations(${i})" 
+                            class="pagination-btn ${isActive ? 'active' : ''}" 
+                            ${isActive ? 'aria-current="page"' : ''}>
+                        ${i}
+                    </button>
+                `;
+            }
+            
+            // Show last page if not in range
+            if (endPage < pagination.total_pages) {
+                if (endPage < pagination.total_pages - 1) {
+                    html += `<span class="px-2 text-gray-400">...</span>`;
+                }
+                html += `<button onclick="loadRegistrations(${pagination.total_pages})" class="pagination-btn">${pagination.total_pages}</button>`;
             }
 
             // Next button
+            html += `
+                <button onclick="loadRegistrations(${pagination.current_page + 1})" 
+                        class="pagination-btn ${pagination.current_page >= pagination.total_pages ? 'disabled' : ''}" 
+                        ${pagination.current_page >= pagination.total_pages ? 'disabled' : ''} title="ໜ້າຕໍ່ໄປ">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                    </svg>
+                </button>
+            `;
+            
+            // Last page button
             if (pagination.current_page < pagination.total_pages) {
-                html += `<button onclick="loadRegistrations(${pagination.current_page + 1})" class="px-3 py-2 border border-gray-300 rounded hover:bg-gray-50">ຕໍ່ໄປ ›</button>`;
+                html += `
+                    <button onclick="loadRegistrations(${pagination.total_pages})" class="pagination-btn ${pagination.current_page === pagination.total_pages ? 'disabled' : ''}" title="ໜ້າສຸດທ້າຍ">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 5l7 7-7 7M4 5l7 7-7 7"/>
+                        </svg>
+                    </button>
+                `;
             }
-
-            html += '</div>';
-            html += `<div class="text-center text-gray-600 text-sm mt-2">
-                        ສະແດງ ${((pagination.current_page - 1) * pagination.per_page) + 1} - ${Math.min(pagination.current_page * pagination.per_page, pagination.total_records)} 
-                        ຈາກທັງໝົດ ${pagination.total_records} ລາຍການ
-                     </div>`;
+            
+            html += `
+                        </div>
+                        
+                        <!-- Right: Quick Jump -->
+                        <div class="flex items-center gap-2 text-sm">
+                            <label class="text-gray-600 hidden sm:inline">ໄປໜ້າ:</label>
+                            <input type="number" 
+                                   id="jump-to-page" 
+                                   min="1" 
+                                   max="${pagination.total_pages}" 
+                                   value="${pagination.current_page}"
+                                   class="w-16 px-2 py-1 text-center border border-gray-300 rounded focus:border-blue-500 focus:ring-1 focus:ring-blue-200"
+                                   onkeypress="if(event.key==='Enter') jumpToPage()">
+                            <button onclick="jumpToPage()" class="px-3 py-1 bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs rounded transition-colors">
+                                ໄປ
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
             
             container.innerHTML = html;
         }
 
         // Show registration detail
         async function showRegistrationDetail(id) {
+            console.log('=== showRegistrationDetail called with ID:', id);
+            console.log('API URL will be:', `${window.location.origin}/backend/admin/registrations.php?page=1&limit=1&id=${id}`);
             try {
                 const result = await api.getRegistrations(1, 1, { id });
+                console.log('API response:', result);
+                console.log('Number of registrations returned:', result.registrations?.length || 0);
                 
                 if (result.success && result.registrations.length > 0) {
                     currentRegistration = result.registrations[0];
+                    console.log('Setting currentRegistration to:', {
+                        id: currentRegistration.id,
+                        student_code: currentRegistration.student_code,
+                        name: currentRegistration.first_name + ' ' + currentRegistration.last_name,
+                        status: currentRegistration.status
+                    });
                     displayRegistrationDetail(currentRegistration);
                     document.getElementById('detail-modal').classList.remove('hidden');
+                } else {
+                    console.error('No registration found for ID:', id);
+                    UIUtils.showAlert('ບໍ່ພົບຂໍ້ມູນການລົງທະບຽນ', 'error');
                 }
             } catch (error) {
                 console.error('Failed to load registration detail:', error);
@@ -363,7 +605,7 @@
         }
 
         function displayRegistrationDetail(reg) {
-            // Debug registration data
+            console.log('=== displayRegistrationDetail called ===');
             console.log('Registration Detail:', {
                 id: reg.id,
                 student_code: reg.student_code,
@@ -373,12 +615,15 @@
             });
             
             // Update modal header with student code
-            document.getElementById('modal-student-code').textContent = `รหัส: ${reg.student_code}`;
+            console.log('Updating modal header with student code:', reg.student_code);
+            document.getElementById('modal-student-code').textContent = `ລະຫັດ: ${reg.student_code}`;
             
-            // Generate unique IDs for images to avoid conflicts
-            const profileImageId = `profile-img-${reg.id}`;
-            const paymentImageId = `payment-img-${reg.id}`;
+            console.log('About to generate HTML for ID:', reg.id);
             
+            // Clear previous content first to avoid ID conflicts
+            document.getElementById('detail-content').innerHTML = '';
+            
+            // Generate fresh content with unique IDs
             document.getElementById('detail-content').innerHTML = `
                 <!-- Personal Information Card -->
                 <div class="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl p-6 border-l-4 border-blue-500">
@@ -573,12 +818,12 @@
                                         <div class="absolute top-0 left-0 bg-blue-600 text-white text-xs px-2 py-1 rounded-br-lg z-10">
                                             ID: ${reg.id} | ${reg.profile_image}
                                         </div>
-                                        <img id="${profileImageId}" 
+                                        <img id="profile-img-${reg.id}" 
                                              src="${window.location.origin}/${reg.profile_image}" 
                                              alt="Profile Image - ${reg.first_name} ${reg.last_name}" 
                                              class="w-full h-64 object-cover rounded-xl border-2 border-gray-200 cursor-pointer hover:border-blue-500 transition-all duration-300 shadow-md hover:shadow-lg"
                                              onclick="openImageModal('${window.location.origin}/${reg.profile_image}', 'Profile Image - ${reg.first_name} ${reg.last_name}')"
-                                             onerror="handleImageError('${profileImageId}', 'profile-container-${reg.id}', '${reg.profile_image}', 'Profile')"
+                                             onerror="handleImageError('profile-img-${reg.id}', 'profile-container-${reg.id}', '${reg.profile_image}', 'Profile')"
                                              onload="console.log('Profile image loaded successfully for ID ${reg.id}:', '${reg.profile_image}')"
                                         
                                         <!-- Overlay with actions -->
@@ -601,19 +846,19 @@
                                         
                                         <!-- File info badge -->
                                         <div class="absolute top-3 right-3 bg-green-500 text-white px-3 py-1 rounded-full text-xs font-medium shadow-lg">
-                                            ✅ มีไฟล์
+                                            ✅ ມີໄຟລ໌
                                         </div>
                                     </div>
                                     
                                     <div class="mt-3 text-center">
-                                        <p class="text-xs text-gray-500">คลิกเพื่อดูขนาดเต็ม</p>
+                                        <p class="text-xs text-gray-500">ກົດເພື່ອເບິ່ງຂະໜາດເຕັມ</p>
                                         <p class="text-xs text-gray-400 mt-1 font-mono">${reg.profile_image}</p>
                                     </div>` :
                                     `<div class="w-full h-64 bg-gray-50 border-2 border-dashed border-gray-300 rounded-xl flex items-center justify-center">
                                         <div class="text-center text-gray-400">
                                             <span class="text-5xl block mb-3">📷</span>
                                             <p class="text-sm font-medium">ບໍ່ມີຮູບໂປຣໄຟລ໌</p>
-                                            <p class="text-xs mt-1">ยังไม่ได้อัปโหลดรูปโปรไฟล์</p>
+                                            <p class="text-xs mt-1">ຍັງບໍ່ໄດ້ອັບໂຫລດຮູບໂປຣໄຟລ໌</p>
                                         </div>
                                     </div>`
                                 }
@@ -638,8 +883,8 @@
                                             </div>
                                             <div class="text-center">
                                                 <span class="text-6xl block mb-3 text-red-500">📄</span>
-                                                <p class="text-sm font-semibold text-red-700">PDF Document</p>
-                                                <p class="text-xs text-red-500 mt-1">คลิกเพื่อเปิด PDF</p>
+                                                <p class="text-sm font-semibold text-red-700">PDF ເອກະສານ</p>
+                                                <p class="text-xs text-red-500 mt-1">ກົດເພື່ອເປີດ PDF</p>
                                             </div>
                                             
                                             <!-- PDF Actions -->
@@ -670,12 +915,12 @@
                                             <div class="absolute top-0 left-0 bg-green-600 text-white text-xs px-2 py-1 rounded-br-lg z-10">
                                                 ID: ${reg.id} | ${reg.payment_proof}
                                             </div>
-                                            <img id="${paymentImageId}"
+                                            <img id="payment-img-${reg.id}"
                                                  src="${window.location.origin}/${reg.payment_proof}" 
                                                  alt="Payment Proof - ${reg.first_name} ${reg.last_name}" 
                                                  class="w-full h-64 object-cover rounded-xl border-2 border-gray-200 cursor-pointer hover:border-green-500 transition-all duration-300 shadow-md hover:shadow-lg"
                                                  onclick="openImageModal('${window.location.origin}/${reg.payment_proof}', 'Payment Proof - ${reg.first_name} ${reg.last_name}')"
-                                                 onerror="handleImageError('${paymentImageId}', 'payment-container-${reg.id}', '${reg.payment_proof}', 'Payment Proof')"
+                                                 onerror="handleImageError('payment-img-${reg.id}', 'payment-container-${reg.id}', '${reg.payment_proof}', 'Payment Proof')"
                                                  onload="console.log('Payment image loaded successfully for ID ${reg.id}:', '${reg.payment_proof}')"
                                             
                                             <!-- Overlay with actions -->
@@ -697,19 +942,19 @@
                                             </div>
                                             
                                             <div class="absolute top-3 right-3 bg-green-500 text-white px-3 py-1 rounded-full text-xs font-medium shadow-lg">
-                                                ✅ มีไฟล์
+                                                ✅ ມີໄຟລ໌
                                             </div>
                                         </div>`
                                     ) + `
                                     <div class="mt-3 text-center">
-                                        <p class="text-xs text-gray-500">คลิกเพื่อดูขนาดเต็ม</p>
+                                        <p class="text-xs text-gray-500">ກົດເພື່ອເບິ່ງຂະໜາດເຕັມ</p>
                                         <p class="text-xs text-gray-400 mt-1 font-mono">${reg.payment_proof}</p>
                                     </div>` :
                                     `<div class="w-full h-64 bg-gray-50 border-2 border-dashed border-gray-300 rounded-xl flex items-center justify-center">
                                         <div class="text-center text-gray-400">
                                             <span class="text-5xl block mb-3">💰</span>
                                             <p class="text-sm font-medium">ບໍ່ມີຫຼັກຖານການຊຳລະ</p>
-                                            <p class="text-xs mt-1">ยังไม่ได้อัปโหลดหลักฐานการชำระเงิน</p>
+                                            <p class="text-xs mt-1">ຍັງບໍ່ໄດ້ອັບໂຫລດຫຼັກຖານການຊຳລະເງິນ</p>
                                         </div>
                                     </div>`
                                 }
@@ -725,6 +970,15 @@
             
             // Debug image loading after a short delay
             setTimeout(() => {
+                console.log('=== Checking for duplicate IDs ===');
+                const profileImages = document.querySelectorAll('[id*="profile-img-"]');
+                const paymentImages = document.querySelectorAll('[id*="payment-img-"]');
+                console.log('Profile images found:', profileImages.length);
+                console.log('Payment images found:', paymentImages.length);
+                
+                profileImages.forEach(img => console.log('Profile image ID:', img.id, 'src:', img.src));
+                paymentImages.forEach(img => console.log('Payment image ID:', img.id, 'src:', img.src));
+                
                 debugImageLoading();
             }, 500);
         }
@@ -846,12 +1100,61 @@
             document.getElementById('export-modal').classList.add('hidden');
         }
 
+        // Pagination utility functions
+        function changePageSize() {
+            const selector = document.getElementById('page-size-selector');
+            const newPageSize = parseInt(selector.value);
+            currentPageSize = newPageSize;
+            
+            // Show loading state
+            showTableLoading(true);
+            
+            // Reset to first page when changing page size
+            loadRegistrations(1, newPageSize);
+        }
+
+        function jumpToPage() {
+            const input = document.getElementById('jump-to-page');
+            const targetPage = parseInt(input.value);
+            
+            // Validate page number
+            if (isNaN(targetPage) || targetPage < 1) {
+                input.value = currentPage;
+                UIUtils.showAlert('ກະລຸນາໃສ່ເລກໜ້າທີ່ຖືກຕ້ອງ', 'warning');
+                return;
+            }
+            
+            // Get max pages from the pagination info (we'll need to track this)
+            const maxPages = parseInt(document.querySelector('#jump-to-page').getAttribute('max'));
+            if (targetPage > maxPages) {
+                input.value = currentPage;
+                UIUtils.showAlert(`ໜ້າສູງສຸດແມ່ນ ${maxPages}`, 'warning');
+                return;
+            }
+            
+            // Show loading state
+            showTableLoading(true);
+            
+            loadRegistrations(targetPage);
+        }
+
+        function showTableLoading(show = true) {
+            const table = document.querySelector('.table-container table');
+            if (show) {
+                table.classList.add('table-loading');
+            } else {
+                table.classList.remove('table-loading');
+            }
+        }
+
         // Filter and utility functions
         function applyFilters() {
+            showTableLoading(true);
             loadRegistrations(1);
         }
 
         function refreshData() {
+            showTableLoading(true);
             loadRegistrations(currentPage);
         }
 
@@ -900,10 +1203,10 @@
                         <p class="text-center font-medium">${title}</p>
                         <div class="flex justify-center mt-2 gap-2">
                             <a href="${src}" download class="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-lg text-sm transition-colors">
-                                📥 ดาวน์โหลด
+                                📥 ດາວໂຫລດ
                             </a>
                             <button onclick="window.open('${src}', '_blank')" class="bg-gray-600 hover:bg-gray-700 px-4 py-2 rounded-lg text-sm transition-colors">
-                                🔗 เปิดใน Tab ใหม่
+                                🔗 ເປີດໃນ Tab ໃໝ່
                             </button>
                         </div>
                     </div>
@@ -938,7 +1241,7 @@
                 toast.innerHTML = `
                     <div class="flex items-center gap-2">
                         <span>✅</span>
-                        <span>คัดลอกแล้ว: ${text}</span>
+                        <span>ຄັດລອກແລ້ວ: ${text}</span>
                     </div>
                 `;
                 document.body.appendChild(toast);
@@ -954,7 +1257,7 @@
                     setTimeout(() => toast.remove(), 300);
                 }, 3000);
             }).catch(() => {
-                alert('ไม่สามารถคัดลอกได้');
+                alert('ບໍ່ສາມາດຄັດລອກໄດ້');
             });
         };
 
@@ -980,6 +1283,11 @@
 
         // Global keyboard shortcuts
         document.addEventListener('keydown', (e) => {
+            // Skip if typing in an input field
+            if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.tagName === 'SELECT') {
+                return;
+            }
+            
             // ESC to close modals
             if (e.key === 'Escape') {
                 hideDetailModal();
@@ -1003,16 +1311,44 @@
                 e.preventDefault();
                 document.getElementById('search-input').focus();
             }
+            
+            // Arrow keys for pagination navigation
+            if (e.key === 'ArrowLeft' && e.ctrlKey) {
+                e.preventDefault();
+                if (currentPage > 1) {
+                    showTableLoading(true);
+                    loadRegistrations(currentPage - 1);
+                }
+            }
+            
+            if (e.key === 'ArrowRight' && e.ctrlKey) {
+                e.preventDefault();
+                const jumpInput = document.getElementById('jump-to-page');
+                const maxPages = parseInt(jumpInput.getAttribute('max'));
+                if (currentPage < maxPages) {
+                    showTableLoading(true);
+                    loadRegistrations(currentPage + 1);
+                }
+            }
         });
 
         // Auto-refresh data every 30 seconds
         let autoRefreshInterval;
         function startAutoRefresh() {
             autoRefreshInterval = setInterval(() => {
+                // Don't auto-refresh if modal is open or user is typing
                 if (!document.getElementById('detail-modal').classList.contains('hidden')) {
-                    return; // Don't refresh if modal is open
+                    return;
                 }
-                loadRegistrations(currentPage);
+                
+                // Don't auto-refresh if user is actively interacting
+                const activeElement = document.activeElement;
+                if (activeElement && (activeElement.tagName === 'INPUT' || activeElement.tagName === 'SELECT')) {
+                    return;
+                }
+                
+                // Refresh silently without loading indicator
+                loadRegistrations(currentPage, currentPageSize);
             }, 30000); // 30 seconds
         }
 
@@ -1044,7 +1380,7 @@
                 hint.innerHTML = `
                     <div class="flex items-center gap-2">
                         <span>💡</span>
-                        <span>เคล็ดลับ: กด Ctrl+F ค้นหา, Ctrl+R รีเฟรช, Ctrl+E ส่งออกข้อมูล</span>
+                        <span>ຄຳແນະນຳ: ກົດ Ctrl+F ຄົ້ນຫາ, Ctrl+R ໂຫລດໃໝ່, Ctrl+E ສົ່ງອອກຂໍ້ມູນ</span>
                         <button onclick="this.parentElement.parentElement.remove()" class="ml-2 text-white hover:text-gray-200">×</button>
                     </div>
                 `;
@@ -1069,7 +1405,7 @@
                 return;
             }
             
-            const errorMessage = imageType === 'Profile' ? 'รูปโปรไฟล์' : 'หลักฐานการชำระ';
+            const errorMessage = imageType === 'Profile' ? 'ຮູບໂປຣໄຟລ໌' : 'ຫຼັກຖານການຊຳລະ';
             
             container.innerHTML = `
                 <div class="w-full h-64 bg-red-50 border-2 border-red-200 rounded-xl flex items-center justify-center">
@@ -1081,7 +1417,7 @@
                         <div class="mt-3">
                             <button onclick="location.reload()" 
                                     class="text-xs bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded-lg transition-colors">
-                                🔄 รีโหลดหน้า
+                                🔄 ໂຫລດໃໝ່
                             </button>
                         </div>
                     </div>

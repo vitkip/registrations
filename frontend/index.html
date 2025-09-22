@@ -31,6 +31,398 @@
         .colored-toast .swal2-html-container {
             color: white;
         }
+
+        /* เพิ่ม Animation และเอฟเฟกต์สวยๆ */
+        .ripple {
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .ripple::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.5);
+            transition: width 0.6s, height 0.6s, top 0.6s, left 0.6s;
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+        }
+        
+        .ripple:active::before {
+            width: 300px;
+            height: 300px;
+            top: 50%;
+            left: 50%;
+        }
+        
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.7);
+            }
+            70% {
+                box-shadow: 0 0 0 10px rgba(59, 130, 246, 0);
+            }
+            100% {
+                box-shadow: 0 0 0 0 rgba(59, 130, 246, 0);
+            }
+        }
+        
+        .bounce-in {
+            animation: bounceIn 0.5s ease-out;
+        }
+        
+        @keyframes bounceIn {
+            0% {
+                transform: scale(0.3);
+                opacity: 0;
+            }
+            50% {
+                transform: scale(1.05);
+            }
+            70% {
+                transform: scale(0.9);
+            }
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+        
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .scale-hover:hover {
+            transform: scale(1.02);
+            transition: transform 0.2s ease;
+        }
+        
+        .glow {
+            box-shadow: 0 0 20px rgba(34, 197, 94, 0.5);
+            animation: glow 2s ease-in-out infinite alternate;
+        }
+        
+        @keyframes glow {
+            from {
+                box-shadow: 0 0 20px rgba(34, 197, 94, 0.5);
+            }
+            to {
+                box-shadow: 0 0 30px rgba(34, 197, 94, 0.8);
+            }
+        }
+        
+        .slide-down {
+            animation: slideDown 0.3s ease-out;
+        }
+        
+        @keyframes slideDown {
+            from {
+                transform: translateY(-10px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+        
+        .success-indicator {
+            position: relative;
+        }
+        
+        .success-indicator::after {
+            content: '✓';
+            position: absolute;
+            top: -10px;
+            right: -10px;
+            background: #10B981;
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: bold;
+            opacity: 0;
+            transform: scale(0);
+            transition: all 0.3s ease;
+        }
+        
+        .success-indicator.show-success::after {
+            opacity: 1;
+            transform: scale(1);
+        }
+        
+        .gradient-text {
+            background: linear-gradient(45deg, #3B82F6, #10B981);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .shimmer {
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .shimmer::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            animation: shimmer 2s infinite;
+        }
+        
+        @keyframes shimmer {
+            0% {
+                left: -100%;
+            }
+            100% {
+                left: 100%;
+            }
+        }
+        
+        .floating {
+            animation: floating 3s ease-in-out infinite;
+        }
+        
+        @keyframes floating {
+            0%, 100% {
+                transform: translateY(0px);
+            }
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+        
+        .rotate-icon {
+            transition: transform 0.3s ease;
+        }
+        
+        .rotate-icon:hover {
+            transform: rotate(360deg);
+        }
+        
+        /* Particle animation */
+        @keyframes particle-float {
+            0% {
+                opacity: 1;
+                transform: translate(0, 0) scale(1);
+            }
+            50% {
+                opacity: 0.8;
+                transform: translate(var(--end-x), calc(var(--end-y) / 2)) scale(1.2);
+            }
+            100% {
+                opacity: 0;
+                transform: translate(var(--end-x), var(--end-y)) scale(0);
+            }
+        }
+        
+        /* Enhanced button animations */
+        .button-effect {
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+        
+        .button-effect::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transition: left 0.5s;
+        }
+        
+        .button-effect:hover::before {
+            left: 100%;
+        }
+        
+        /* Success checkmark animation */
+        .checkmark {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            display: inline-block;
+            stroke-width: 2;
+            stroke: #10B981;
+            stroke-miterlimit: 10;
+            box-shadow: inset 0px 0px 0px #10B981;
+            animation: fill 0.4s ease-in-out 0.4s forwards, scale 0.3s ease-in-out 0.9s both;
+        }
+        
+        .checkmark-circle {
+            stroke-dasharray: 166;
+            stroke-dashoffset: 166;
+            stroke-width: 2;
+            stroke-miterlimit: 10;
+            stroke: #10B981;
+            fill: none;
+            animation: stroke 0.6s cubic-bezier(0.65, 0, 0.45, 1) forwards;
+        }
+        
+        .checkmark-check {
+            transform-origin: 50% 50%;
+            stroke-dasharray: 48;
+            stroke-dashoffset: 48;
+            animation: stroke 0.3s cubic-bezier(0.65, 0, 0.45, 1) 0.8s forwards;
+        }
+        
+        @keyframes stroke {
+            100% {
+                stroke-dashoffset: 0;
+            }
+        }
+        
+        @keyframes scale {
+            0%, 100% {
+                transform: none;
+            }
+            50% {
+                transform: scale3d(1.1, 1.1, 1);
+            }
+        }
+        
+        @keyframes fill {
+            100% {
+                box-shadow: inset 0px 0px 0px 30px #10B981;
+            }
+        }
+        
+        /* Ripple expand effect */
+        @keyframes ripple-expand {
+            0% {
+                transform: scale(0.8);
+                opacity: 1;
+            }
+            100% {
+                transform: scale(2);
+                opacity: 0;
+            }
+        }
+        
+        /* Loading spinner for async operations */
+        .spinner {
+            border: 2px solid #f3f3f3;
+            border-top: 2px solid #10B981;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            animation: spin 1s linear infinite;
+            display: inline-block;
+            margin-right: 8px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* Typing effect */
+        .typing-effect {
+            overflow: hidden;
+            border-right: 2px solid #10B981;
+            white-space: nowrap;
+            animation: typing 2s steps(40, end), blink-caret 0.75s step-end infinite;
+        }
+        
+        @keyframes typing {
+            from { width: 0 }
+            to { width: 100% }
+        }
+        
+        @keyframes blink-caret {
+            from, to { border-color: transparent }
+            50% { border-color: #10B981 }
+        }
+        
+        /* Confetti animation */
+        @keyframes confetti-fall {
+            0% {
+                opacity: 1;
+                transform: translateY(-100vh) rotate(0deg);
+            }
+            100% {
+                opacity: 0;
+                transform: translateY(100vh) rotate(720deg);
+            }
+        }
+        
+        /* Shake animation for errors */
+        .shake {
+            animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both;
+            transform: translate3d(0, 0, 0);
+            backface-visibility: hidden;
+            perspective: 1000px;
+        }
+        
+        @keyframes shake {
+            10%, 90% {
+                transform: translate3d(-1px, 0, 0);
+            }
+            20%, 80% {
+                transform: translate3d(2px, 0, 0);
+            }
+            30%, 50%, 70% {
+                transform: translate3d(-4px, 0, 0);
+            }
+            40%, 60% {
+                transform: translate3d(4px, 0, 0);
+            }
+        }
+        
+        /* Enhanced hover effects */
+        .bank-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+        }
+        
+        /* Progress bar animation */
+        .progress-bar {
+            width: 100%;
+            height: 4px;
+            background-color: #e5e7eb;
+            border-radius: 2px;
+            overflow: hidden;
+        }
+        
+        .progress-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #10B981, #3B82F6);
+            animation: progress-fill 2s ease-in-out;
+        }
+        
+        @keyframes progress-fill {
+            0% { width: 0%; }
+            100% { width: 100%; }
+        }
     </style>
 </head>
 <body class="bg-gray-50">
@@ -39,7 +431,7 @@
         <div class="container mx-auto px-4 flex justify-between items-center">
             <a href="#" class="navbar-brand flex items-center">
                 <span class="text-2xl mr-2">🎓</span>
-                ລະບົບລົງທະບຽນຮັບໃບປະກາດນິຍະບັດ ວິທະຍາໄລຄູສົງ ອົງຕື້
+                ລົງທະບຽນເຂົ້າຮັບໃບປະກາດນິຍະບັດ ວິທະຍາໄລຄູສົງ ອົງຕື້
             </a>
             <div class="navbar-nav hidden md:flex">
                 <a href="#registration" class="nav-link">ລົງທະບຽນ</a>
@@ -93,7 +485,7 @@
                 </p>
             </div>
             <p class="text-lg mb-12 opacity-80 max-w-2xl mx-auto">
-                ນັກສຶກສາທຸກອົງທີ່ຈັບໃນ ສົກຮຽນ 2020-2025 ສາມາດລົງທະບຽນເຂົ້າຮັບໃບປະການໄດ້
+                ນັກສຶກສາທຸກອົງທີ່ຈົບໃນ ສົກຮຽນ 2020-2025 ສາມາດລົງທະບຽນເຂົ້າຮັບໃບປະການໄດ້
             </p>
             <div class="flex flex-col md:flex-row gap-6 justify-center">
                 <button onclick="scrollToSection('registration')" class="btn-primary text-lg px-10 py-4 rounded-full shadow-2xl hover:shadow-blue-500/25 transform hover:scale-105 transition-all duration-300">
@@ -202,14 +594,49 @@
                         <!-- Course Information -->
                         <div class="bg-gradient-to-r from-green-50 to-emerald-50 rounded-2xl p-6 border-l-4 border-green-500">
                             <div class="flex items-center gap-3 mb-6">
-                                <div class="w-8 h-8 bg-green-500 text-white rounded-lg flex items-center justify-center">
-                                    <span class="text-sm">💰</span>
-                                </div>
-                                <div class="group cursor-pointer" onclick="copyToClipboard('010120001062171001', this)">
-                                    <h3 class="text-xl font-bold text-green-800 lao-text flex items-center gap-2">
-                                        <span>BCEL:010120001062171001</span>
-                                        <span class="text-sm text-gray-500 opacity-0 group-hover:opacity-100 transition-opacity">📋</span>
-                                    </h3>
+                               
+                                <div class="group cursor-pointer bg-gradient-to-r from-green-50 to-emerald-50 hover:from-green-100 hover:to-emerald-100 rounded-xl p-4 border border-green-200 hover:border-green-300 transition-all duration-300 hover:shadow-lg relative overflow-hidden" 
+                                     onclick="copyToClipboard('010120001062171001', this)"
+                                     title="ກົດເພື່ອຄັດລອກເລກບັນຊີ BCEL">
+                                    
+                                    <!-- Ripple effect background -->
+                                    <div class="absolute inset-0 bg-green-300 opacity-0 group-active:opacity-20 transition-opacity duration-150"></div>
+                                    
+                                    <!-- Bank info header -->
+                                    <div class="flex items-center gap-3 mb-2 relative z-10">
+                                        <div class="w-8 h-8 bg-green-600 text-white rounded-lg flex items-center justify-center font-bold text-sm">
+                                            B
+                                        </div>
+                                        <div class="text-sm text-green-700 font-medium">
+                                            BCEL Bank (ທະນາຄານ BCEL)
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Account number -->
+                                    <div class="relative z-10">
+                                        <h3 class="text-xl font-bold text-green-800 lao-text flex items-center gap-2 mb-1">
+                                            <span class="font-mono tracking-wider">010120001062171001</span>
+                                            <div class="flex items-center gap-1">
+                                                <span class="text-sm text-green-600 opacity-60 group-hover:opacity-100 transition-all duration-300 transform group-hover:scale-110">📋</span>
+                                                <span class="text-xs text-green-600 opacity-0 group-hover:opacity-100 transition-all duration-300 translate-x-2 group-hover:translate-x-0">Copy</span>
+                                            </div>
+                                        </h3>
+                                        
+                                        <!-- Formatted account display -->
+                                        <div class="text-sm text-gray-600 font-mono">
+                                            0101-2000-1062-171001
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Copy instruction -->
+                                    <div class="mt-2 text-xs text-green-600 opacity-70 group-hover:opacity-100 transition-opacity relative z-10">
+                                        <span>�</span> ກົດເພື່ອຄັດລອກເລກບັນຊີ
+                                    </div>
+                                    
+                                    <!-- Success indicator (hidden by default) -->
+                                    <div class="absolute top-2 right-2 bg-green-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs opacity-0 scale-0 transition-all duration-300" id="copy-success-indicator">
+                                        ✓
+                                    </div>
                                 </div>
                             </div>
                             
@@ -274,7 +701,7 @@
                                 <div class="w-8 h-8 bg-orange-500 text-white rounded-lg flex items-center justify-center">
                                     <span class="text-sm">📎</span>
                                 </div>
-                                <h3 class="text-xl font-bold text-orange-800 lao-text">ເອກະສານ</h3>
+                                <h3 class="text-xl font-bold text-orange-800 lao-text">ຮູບຕິດບັດ ແລະ ຫຼັກຖານການຊຳລະເງີນ</h3>
                             </div>
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div class="form-group">
@@ -685,6 +1112,288 @@
                 });
             });
         };
+
+        // ฟังก์ชันคัดลอกข้อมูลธนาคารที่ปรับปรุงแล้ว พร้อมเอฟเฟกต์สุดล้ำ
+        window.copyToClipboard = function(text, element) {
+            navigator.clipboard.writeText(text).then(() => {
+                // แสดง success indicator พร้อม animation
+                const successIndicator = element.querySelector('#copy-success-indicator');
+                if (successIndicator) {
+                    successIndicator.style.opacity = '1';
+                    successIndicator.style.transform = 'scale(1) rotate(360deg)';
+                    successIndicator.classList.add('bounce-in');
+                    
+                    // ซ่อน indicator หลังจาง 3 วินาที พร้อม fade out
+                    setTimeout(() => {
+                        successIndicator.style.opacity = '0';
+                        successIndicator.style.transform = 'scale(0) rotate(0deg)';
+                        successIndicator.classList.remove('bounce-in');
+                    }, 3000);
+                }
+
+                // เอฟเฟกต์การกดปุ่มแบบ Advanced
+                element.classList.add('ripple', 'pulse', 'glow');
+                element.style.transform = 'scale(0.95)';
+                element.style.background = 'linear-gradient(135deg, #10B981, #059669, #047857)';
+                element.style.boxShadow = '0 8px 32px rgba(34, 197, 94, 0.4), 0 0 20px rgba(16, 185, 129, 0.6)';
+                
+                // กลับสู่สถานะเดิมพร้อม smooth transition
+                setTimeout(() => {
+                    element.style.transform = 'scale(1.02)';
+                }, 100);
+                
+                setTimeout(() => {
+                    element.style.transform = 'scale(1)';
+                    element.style.background = '';
+                    element.style.boxShadow = '';
+                    element.classList.remove('ripple', 'pulse', 'glow');
+                }, 600);
+
+                // สร้าง particle effect
+                createCopyParticles(element);
+
+                // แสดง SweetAlert2 toast แบบพิเศษ
+                Swal.fire({
+                    icon: 'success',
+                    title: 'ຄັດລອກສຳເລັດ! ✨🏦',
+                    html: `
+                        <div class="text-center fade-in">
+                            <div class="inline-block mb-3">
+                                <svg class="checkmark w-16 h-16 mx-auto" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52 52">
+                                    <circle class="checkmark-circle" cx="26" cy="26" r="25" fill="none"/>
+                                    <path class="checkmark-check" fill="none" d="m14.1 27.2l7.1 7.2 16.7-16.8"/>
+                                </svg>
+                            </div>
+                            <p class="text-sm text-gray-600 mb-2 gradient-text">ເລກບັນຊີ BCEL</p>
+                            <div class="bg-gradient-to-r from-green-100 to-blue-100 p-3 rounded-lg border-2 border-green-200 mb-3 shimmer">
+                                <p class="font-bold text-xl text-green-700 font-mono">0101-2000-1062-171001</p>
+                            </div>
+                            <p class="text-xs text-gray-500 mt-2 typing-effect">ຖືກຄັດລອກໄປໃນຄລິບບອດແລ້ວ 📋</p>
+                            <div class="mt-3 flex justify-center space-x-2">
+                                <span class="inline-block w-2 h-2 bg-green-400 rounded-full animate-ping"></span>
+                                <span class="inline-block w-2 h-2 bg-green-400 rounded-full animate-ping" style="animation-delay: 0.1s"></span>
+                                <span class="inline-block w-2 h-2 bg-green-400 rounded-full animate-ping" style="animation-delay: 0.2s"></span>
+                            </div>
+                        </div>
+                    `,
+                    timer: 4000,
+                    timerProgressBar: true,
+                    showConfirmButton: false,
+                    toast: true,
+                    position: 'top-end',
+                    width: 400,
+                    customClass: {
+                        popup: 'colored-toast bounce-in'
+                    },
+                    showClass: {
+                        popup: 'animate__animated animate__slideInDown animate__faster'
+                    },
+                    hideClass: {
+                        popup: 'animate__animated animate__slideOutUp animate__faster'
+                    },
+                    didOpen: (toast) => {
+                        // เพิ่มเอฟเฟกต์เมื่อเปิด toast
+                        toast.classList.add('glow', 'floating');
+                        
+                        // เพิ่ม confetti effect
+                        setTimeout(() => {
+                            createConfettiEffect();
+                        }, 500);
+                    },
+                    willClose: (toast) => {
+                        toast.classList.remove('glow', 'floating');
+                    }
+                });
+
+            }).catch((error) => {
+                // เอฟเฟกต์สำหรับ error
+                element.classList.add('shake');
+                element.style.background = 'linear-gradient(135deg, #EF4444, #DC2626)';
+                element.style.transform = 'scale(0.98)';
+                element.style.boxShadow = '0 4px 20px rgba(239, 68, 68, 0.4)';
+                
+                setTimeout(() => {
+                    element.style.background = '';
+                    element.style.transform = 'scale(1)';
+                    element.style.boxShadow = '';
+                    element.classList.remove('shake');
+                }, 500);
+
+                // แสดงข้อความผิดพลาดแบบสวยงาม
+                Swal.fire({
+                    icon: 'error',
+                    title: 'ຄັດລອກບໍ່ສຳເລັດ! ⚠️',
+                    html: `
+                        <div class="text-center fade-in">
+                            <div class="mb-4">
+                                <div class="mx-auto w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mb-3">
+                                    <span class="text-3xl">❌</span>
+                                </div>
+                            </div>
+                            <p class="text-sm text-gray-600 mb-3">ກະລຸນາຄັດລອກເລກບັນຊີດ້ວຍຕົນເອງ:</p>
+                            <div class="bg-gradient-to-r from-gray-50 to-gray-100 p-4 rounded-lg border-2 border-gray-200 mb-3 button-effect">
+                                <p class="font-mono text-xl font-bold text-gray-800 select-all">010120001062171001</p>
+                                <p class="text-xs text-gray-500 mt-1">ກົດແລະລາກເພື່ອເລືອກ</p>
+                            </div>
+                            <div class="text-xs text-red-600 mt-2">
+                                <span class="spinner"></span>
+                                ລະບົບຄັດລອກອັດຕະໂນມັດບໍ່ສາມາດໃຊ້ງານໄດ້
+                            </div>
+                        </div>
+                    `,
+                    confirmButtonText: '🔄 ລອງອີກຄັ້ງ',
+                    showCancelButton: true,
+                    cancelButtonText: '❌ ປິດ',
+                    confirmButtonColor: '#ef4444',
+                    cancelButtonColor: '#6b7280',
+                    customClass: {
+                        popup: 'rounded-xl shadow-xl bounce-in',
+                        confirmButton: 'button-effect',
+                        cancelButton: 'button-effect'
+                    },
+                    showClass: {
+                        popup: 'animate__animated animate__shakeX animate__faster'
+                    }
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        // ลองคัดลอกอีกครั้ง
+                        window.copyToClipboard(text, element);
+                    }
+                });
+            });
+        };
+
+        // ฟังก์ชันสร้าง particle effect เมื่อคัดลอกสำเร็จ ✨
+        function createCopyParticles(element) {
+            const rect = element.getBoundingClientRect();
+            const particles = 8; // เพิ่มจำนวน particle
+            
+            for (let i = 0; i < particles; i++) {
+                const particle = document.createElement('div');
+                
+                // สร้าง particle แบบสุ่ม
+                const particleTypes = ['💰', '✨', '⭐', '💎', '🎉', '💚'];
+                const randomType = Math.random();
+                
+                if (randomType < 0.3) {
+                    // Text particle
+                    particle.textContent = particleTypes[Math.floor(Math.random() * particleTypes.length)];
+                    particle.style.cssText = `
+                        position: fixed;
+                        font-size: 16px;
+                        pointer-events: none;
+                        z-index: 9999;
+                        left: ${rect.left + rect.width / 2}px;
+                        top: ${rect.top + rect.height / 2}px;
+                        animation: particle-float 1.5s ease-out forwards;
+                    `;
+                } else {
+                    // Dot particle
+                    const colors = ['#10B981', '#059669', '#047857', '#34D399', '#6EE7B7'];
+                    particle.style.cssText = `
+                        position: fixed;
+                        width: ${4 + Math.random() * 6}px;
+                        height: ${4 + Math.random() * 6}px;
+                        background: ${colors[Math.floor(Math.random() * colors.length)]};
+                        border-radius: 50%;
+                        pointer-events: none;
+                        z-index: 9999;
+                        left: ${rect.left + rect.width / 2}px;
+                        top: ${rect.top + rect.height / 2}px;
+                        animation: particle-float 1.2s ease-out forwards;
+                        box-shadow: 0 0 10px rgba(16, 185, 129, 0.5);
+                    `;
+                }
+                
+                // สุ่มทิศทางการเคลื่อนที่แบบ 360 องศา
+                const angle = (i * (360 / particles) + Math.random() * 30) * Math.PI / 180;
+                const distance = 60 + Math.random() * 40;
+                const endX = Math.cos(angle) * distance;
+                const endY = Math.sin(angle) * distance - (20 + Math.random() * 20);
+                
+                particle.style.setProperty('--end-x', endX + 'px');
+                particle.style.setProperty('--end-y', endY + 'px');
+                
+                document.body.appendChild(particle);
+                
+                // ลบ particle หลังจาก animation จบ
+                setTimeout(() => {
+                    if (particle.parentNode) {
+                        particle.parentNode.removeChild(particle);
+                    }
+                }, 1500);
+            }
+            
+            // เพิ่ม ripple effect พิเศษ
+            createRippleEffect(element);
+        }
+
+        // ฟังก์ชันสร้าง ripple effect
+        function createRippleEffect(element) {
+            const rect = element.getBoundingClientRect();
+            const ripple = document.createElement('div');
+            
+            ripple.style.cssText = `
+                position: fixed;
+                left: ${rect.left}px;
+                top: ${rect.top}px;
+                width: ${rect.width}px;
+                height: ${rect.height}px;
+                border-radius: 12px;
+                background: radial-gradient(circle, rgba(16, 185, 129, 0.3) 0%, transparent 70%);
+                pointer-events: none;
+                z-index: 9998;
+                animation: ripple-expand 0.8s ease-out forwards;
+            `;
+            
+            document.body.appendChild(ripple);
+            
+            setTimeout(() => {
+                if (ripple.parentNode) {
+                    ripple.parentNode.removeChild(ripple);
+                }
+            }, 800);
+        }
+
+        // ฟังก์ชันสร้าง confetti effect 🎉
+        function createConfettiEffect() {
+            const colors = ['#10B981', '#3B82F6', '#F59E0B', '#EF4444', '#8B5CF6', '#F97316'];
+            const confettiCount = 50;
+            
+            for (let i = 0; i < confettiCount; i++) {
+                const confetti = document.createElement('div');
+                const color = colors[Math.floor(Math.random() * colors.length)];
+                
+                confetti.style.cssText = `
+                    position: fixed;
+                    width: ${Math.random() * 8 + 4}px;
+                    height: ${Math.random() * 8 + 4}px;
+                    background-color: ${color};
+                    top: -10px;
+                    left: ${Math.random() * window.innerWidth}px;
+                    z-index: 10000;
+                    pointer-events: none;
+                    animation: confetti-fall ${Math.random() * 3 + 2}s linear forwards;
+                    transform: rotate(${Math.random() * 360}deg);
+                `;
+                
+                // สุ่มรูปแบบ confetti
+                if (Math.random() > 0.5) {
+                    confetti.style.borderRadius = '50%';
+                } else {
+                    confetti.style.borderRadius = '0';
+                }
+                
+                document.body.appendChild(confetti);
+                
+                // ลบ confetti หลัง animation จบ
+                setTimeout(() => {
+                    if (confetti.parentNode) {
+                        confetti.parentNode.removeChild(confetti);
+                    }
+                }, 5000);
+            }
+        }
 
         // ฟังก์ชันโหลดจำนวนผู้ลงทะเบียน
         async function loadRegistrationCount() {

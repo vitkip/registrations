@@ -64,12 +64,19 @@ function handleGetRegistrations($pdo, $authData) {
         $search = $_GET['search'] ?? '';
         $date_from = $_GET['date_from'] ?? '';
         $date_to = $_GET['date_to'] ?? '';
+        $id = intval($_GET['id'] ?? 0);
         
         $offset = ($page - 1) * $limit;
         
         // Build WHERE conditions
         $where_conditions = [];
         $params = [];
+        
+        // Filter by specific ID (for detail view)
+        if ($id > 0) {
+            $where_conditions[] = 'id = ?';
+            $params[] = $id;
+        }
         
         if (!empty($status)) {
             $where_conditions[] = 'status = ?';
